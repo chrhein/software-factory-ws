@@ -1,0 +1,60 @@
+/*
+ * Woltora: a colour variant of Kilden (data-theme="bekk-woltora").
+ * The Bekk brand provides fonts, shape and density. This file only swaps the
+ * dominant, accent and neutral colours for the colours of the Woltora logo.
+ *
+ *   Green   #1d4636   Orange   #f1a53b
+ *   Light   #f2f6f0   Surface  #e6ebe5   Muted text  #4a5e53
+ *
+ * The app always runs in light mode (data-color-scheme="light" in index.html).
+ */
+[data-theme="bekk-woltora"] {
+  /* Dominant: the dark green brand colour */
+  --color-dominant-background-default: #f2f6f0;
+  --color-dominant-background-tinted: #e6ebe5;
+  --color-dominant-surface-default: #ffffff;
+  --color-dominant-surface-tinted: #e6ebe5;
+  --color-dominant-surface-hover: #dbe3da;
+  --color-dominant-surface-active: #cdd8cc;
+  --color-dominant-border-subtle: #cdd8cc;
+  --color-dominant-border-default: #8aa093;
+  --color-dominant-border-strong: #4a5e53;
+  --color-dominant-text-subtle: #4a5e53;
+  --color-dominant-text-default: #1d4636;
+  --color-dominant-base-default: #1d4636;
+  --color-dominant-base-hover: #2a5a47;
+  --color-dominant-base-active: #153427;
+  --color-dominant-base-contrast-subtle: #b9cdc1;
+  --color-dominant-base-contrast-default: #f2f6f0;
+
+  /* Accent: the orange from the W in the logo */
+  --color-accent-background-default: #fff8ee;
+  --color-accent-background-tinted: #fdebd0;
+  --color-accent-surface-default: #ffffff;
+  --color-accent-surface-tinted: #fde3bd;
+  --color-accent-surface-hover: #fbd79f;
+  --color-accent-surface-active: #f8c97d;
+  --color-accent-border-subtle: #f5c47c;
+  --color-accent-border-default: #d98a1c;
+  --color-accent-border-strong: #a86412;
+  --color-accent-text-subtle: #8a5310;
+  --color-accent-text-default: #5c3606;
+  --color-accent-base-default: #f1a53b;
+  --color-accent-base-hover: #e8962a;
+  --color-accent-base-active: #d4841c;
+  --color-accent-base-contrast-subtle: #5c3606;
+  --color-accent-base-contrast-default: #1d4636;
+
+  /* Neutral: grey with a slight green tint */
+  --color-neutral-background-default: #f7f9f6;
+  --color-neutral-background-tinted: #eef2ec;
+  --color-neutral-surface-default: #ffffff;
+  --color-neutral-surface-tinted: #e6ebe5;
+  --color-neutral-surface-hover: #dde4dc;
+  --color-neutral-surface-active: #cfd8ce;
+  --color-neutral-border-subtle: #d5ddd4;
+  --color-neutral-border-default: #a7b5ab;
+  --color-neutral-border-strong: #4a5e53;
+  --color-neutral-text-subtle: #4a5e53;
+  --color-neutral-text-default: #1a2a22;
+}

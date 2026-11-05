@@ -1,0 +1,7 @@
+@import "tailwindcss";
+@import "@kilden/designsystem/strict.css";
+@import "@kilden/designsystem/styles.css";
+@import "@kilden/designsystem/fonts/bekk.css";
+@import "./woltora-tema.css";
+
+@source "./";

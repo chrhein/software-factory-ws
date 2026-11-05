@@ -1,0 +1,5 @@
+{
+  "permissions": {
+    "deny": ["Read(./workshop.html)", "Read(./FACILITATOR.md)", "Read(./solution/**)"]
+  }
+}

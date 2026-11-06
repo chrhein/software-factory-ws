@@ -1,6 +1,12 @@
 #!/usr/bin/env bash
-# Mål fabrikken: kostnad og tid per steg, hvor ofte verify består, og hvor ofte et menneske godtok resultatet.
-jq -s '
-  { stages: (map(select(.usd)) | group_by(.stage) | map({stage: .[0].stage, runs: length, usd: (map(.usd) | add * 100 | round / 100), sec: (map(.sec) | add)})),
-    verify:   (map(select(.stage == "5-verify")) | {pass: map(select(.ok)) | length, total: length}),
-    human:    (map(select(.stage == "human"))    | {accepted: map(select(.accepted)) | length, total: length}) }' runs/log.jsonl
+# Mål fabrikken: hvordan sakene endte, hvilken sperre som stoppet dem, og tid per steg.
+node -e '
+const log = require("fs").readFileSync("runs/log.jsonl", "utf8").trim().split("\n").map(JSON.parse);
+const count = (rows, key) => rows.reduce((acc, r) => ({ ...acc, [r[key]]: (acc[r[key]] ?? 0) + 1 }), {});
+const ends = log.filter(r => r.stage === "end");
+const steps = {};
+for (const r of log.filter(r => r.sec !== undefined)) { const s = (steps[r.stage] ??= { kjøringer: 0, sekunder: 0 }); s.kjøringer++; s.sekunder += r.sec; }
+console.log("Slik endte sakene:", count(ends, "end"));
+console.log("Stoppet av:", count(ends.filter(r => r.end !== "SHIPPET"), "at"));
+console.table(steps);
+'

@@ -1,22 +1,24 @@
 #!/usr/bin/env bash
-# Fabrikken: én sak gjennom alle stegene, med et menneske til slutt.
-# Bruk: factory/run.sh backlog/<sak>.md
-set -euo pipefail
+# Fabrikken: én sak gjennom alle stegene og ut i produksjon. Stopper en sperre saken, får et menneske den.
+# Bruk: factory/run.sh <sak.md> [--dry-run]   --dry-run stopper før ship og lar endringen ligge i src/.
+set -Eeuo pipefail
 ticket=$1
-git diff --quiet -- src || { echo "src/ har endringer som ikke er committet. Ship eller kast dem først."; exit 1; }
+git diff --quiet -- src || { echo "src/ har endringer som ikke er committet. Kast dem med: git restore src"; exit 1; }
 run=runs/$(basename "$ticket" .md)-$(date +%H%M%S)
 mkdir -p "$run"; cp "$ticket" "$run/0-ticket.md"
 step() { echo; echo "── $1"; factory/stage.sh "$1" "$run"; }
+log()  { echo "{\"run\":\"$run\",\"stage\":\"end\",\"end\":\"$(head -1 "$run/9-end.md" | cut -d: -f1)\",\"at\":\"$1\"}" >> runs/log.jsonl; }
+stop() { git restore src && git clean -fdq src; { echo "STOPPET: $2"; echo; cat "$3"; } | tee "$run/9-end.md"; log "$1"; exit 0; }
+trap 'stop krasj "et steg krasjet." /dev/null' ERR
 
 step 1-triage
-decision=$(head -1 "$run/1-triage.md")
-case $decision in
-  *needs-spec*)  step 2-spec
-                 read -rp "Svar på spørsmålene i $run/2-spec.md, lagre og trykk Enter " ;;
-  *automatable*) ;;
-  *)             echo; echo "Stoppet: triage svarte «$decision». Se $run/1-triage.md"; exit 0 ;;
-esac
+head -1 "$run/1-triage.md" | grep -q automatable || stop triage "triage vil at et menneske ser på saken." "$run/1-triage.md"
+step 2-test
 step 3-build
 step 4-review
-echo; echo "── 5-verify"; factory/verify.sh "$run" || true
-echo; echo "Din tur: Les git diff og $run/, og kjør så factory/ship.sh $run   (eller factory/ship.sh $run no)"
+echo; echo "── 5-verify"
+factory/verify.sh "$run"                     || stop verify "verify sa nei." "$run/5-verify.md"
+head -1 "$run/4-review.md" | grep -q approve || stop review "review sa nei." "$run/4-review.md"
+[ "${2:-}" != --dry-run ] || { echo; echo "Tørrkjøring: endringen ligger i src/."; exit 0; }
+echo; echo "── ship"
+factory/ship.sh "$run"

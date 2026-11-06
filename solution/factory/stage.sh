@@ -2,16 +2,18 @@
 # Ett steg: prompt + felles kontekst + alt tidligere i kjøringen → claude -p → en fil og en linje i loggen.
 # Bruk: factory/stage.sh <steg> <kjøremappe>
 set -euo pipefail
-stage=$1; run=$2; mcp=""
+stage=$1; run=$2; mcp=""; deny=""
 case $stage in
-  3-build)   tools="Read,Edit,Write,Glob,Grep,Bash(npm test:*),Bash(npm run build:*)" ;;
+  2-test)    tools="Read,Glob,Grep,Edit(src/**/*.test.ts),Bash(npm test:*)" ;;
+  3-build)   tools="Read,Glob,Grep,Edit(src/**),Bash(npm test:*),Bash(npm run build:*)"; deny="Edit(src/**/*.test.ts)" ;;
   5-check)   tools="mcp__playwright"; mcp=factory/mcp.json ;;
-  6-monitor) tools="Read,Glob,Grep,Write" ;;
-  *)         tools="Read,Glob,Grep,Bash(git diff:*),Bash(npm test:*)" ;;
+  6-monitor) tools="Read,Glob,Grep,Bash(gh issue list:*)" ;;
+  *)         tools="Read,Glob,Grep,Bash(git diff:*),Bash(git status:*),Bash(npm test:*)" ;;
 esac
-json=$({ cat "factory/$stage.md" factory/context.md; echo "<input>"; cat "$run"/*.md 2>/dev/null || true; echo "</input>"; } \
-  | claude -p --output-format json --allowedTools "$tools" ${mcp:+--mcp-config "$mcp"} --max-budget-usd 1)
-jq -r .result <<<"$json" > "$run/$stage.md"
-jq -c --arg run "$run" --arg stage "$stage" '{run: $run, stage: $stage, usd: .total_cost_usd, sec: (.duration_ms / 1000 | floor)}' <<<"$json" >> runs/log.jsonl
+start=$(date +%s)
+out=$({ cat "factory/$stage.md" factory/context.md; echo "<input>"; cat "$run"/*.md 2>/dev/null || true; echo "</input>"; } \
+  | claude -p --permission-mode dontAsk --allowedTools "$tools" ${deny:+--disallowedTools "$deny"} ${mcp:+--mcp-config "$mcp"} --max-budget-usd 1)
+printf '%s\n' "$out" > "$run/$stage.md"
+echo "{\"run\":\"$run\",\"stage\":\"$stage\",\"sec\":$(( $(date +%s) - start ))}" >> runs/log.jsonl
 grep '^LESSON:' "$run/$stage.md" | sed 's/^LESSON: */- /' >> factory/context.md || true
 cat "$run/$stage.md"

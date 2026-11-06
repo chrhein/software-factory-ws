@@ -3,6 +3,7 @@ on:
   pull_request:
   push:
     branches: [main]
+  workflow_dispatch:
 
 jobs:
   test:
@@ -14,3 +15,22 @@ jobs:
       - run: npm ci
       - run: npm test
       - run: npm run build
+
+  # Main går rett i produksjon på GitHub Pages når testene er grønne. Malen selv deployer ikke.
+  deploy:
+    if: github.event_name != 'pull_request' && !github.event.repository.is_template
+    needs: test
+    runs-on: ubuntu-latest
+    permissions: { pages: write, id-token: write }
+    environment: { name: github-pages, url: "${{ steps.deploy.outputs.page_url }}" }
+    concurrency: { group: pages, cancel-in-progress: false }
+    steps:
+      - uses: actions/checkout@v5
+      - uses: actions/setup-node@v5
+        with: { node-version-file: .nvmrc, cache: npm }
+      - run: npm ci
+      - run: npm run build -- --base=./
+      - uses: actions/upload-pages-artifact@v5
+        with: { path: dist }
+      - id: deploy
+        uses: actions/deploy-pages@v5

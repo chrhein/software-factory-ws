@@ -27,7 +27,7 @@ function issueLenke(linjer: Linje[], total: string): string {
     ? linjer.map((l) => `- ${l.antall} × ${l.rett.navn} (${formaterKroner(l.rett.pris * l.antall)})`).join("\n")
     : "- (tom)";
   const body = `## Hva skjedde?\n\n\n## Hva forventet du?\n\n\n## Handlekurven da det skjedde\n\n${kurv}\n\nTotalt i appen: ${total}\n`;
-  const q = new URLSearchParams({ labels: "bug", body });
+  const q = new URLSearchParams({ labels: "bug,factory", body });
   return `https://github.com/${REPO}/issues/new?${q}`;
 }
 
@@ -59,7 +59,7 @@ export function App() @{
       <div class="mx-auto max-w-6xl px-6 py-10 md:px-12 md:py-14 grid gap-8">
         <div class="flex flex-wrap items-center justify-between gap-4">
           <div class="flex items-center gap-4">
-            <img src="/woltora-ikon-oransje.svg" alt="" class="size-14 md:size-16" />
+            <img src="woltora-ikon-oransje.svg" alt="" class="size-14 md:size-16" />
             <div class="grid">
               <span class="font-display font-medium text-heading-md tracking-tight leading-none">{"Woltora"}</span>
               <span class="text-body text-accent-base-default">{"mat til døra"}</span>

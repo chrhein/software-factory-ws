@@ -1,26 +1,26 @@
-# En dårlig programvarefabrikk
+# Bygg en programvarefabrikk
 
-En workshop på to og en halv time for faggruppen for avansert AI. Den bygger på Warp-artikkelen [«What is a software factory?»](https://www.warp.dev/articles/what-is-a-software-factory).
+En workshop på to timer for faggruppen for avansert AI. Den bygger på Warp-artikkelen [«What is a software factory?»](https://www.warp.dev/articles/what-is-a-software-factory) og på hvordan [StrongDM shipper uten å lese koden](https://simonwillison.net/2026/feb/7/software-factory/).
 
-Du bygger den minste loopen som kan kalles en fabrikk, ett steg om gangen, på Woltora (demoappen fra workshopen om triggede agenter). Så sammenligner du med å fikse en feil på vanlig måte, og avgjør om det var verdt det.
+Du bygger en loop som tar en feilmelding fra Woltora (demoappen fra workshopen om triggede agenter) helt ut i produksjon uten at noen leser koden. Underveis prøver du å lure hvert steg, så du vet hva du kan stole på.
 
 ```
-backlog/ ─→ triage ─→ (spec + menneske) ─→ build ─→ review ─→ verify ─→ menneske ─→ PR + CI
-   ↑        agent           agent          agent    agent   vanlig kode ship.sh
-   └──────────────────────── monitor (agent) melder neste sak ─────────────────────────┘
-     alle stegene leser factory/context.md · alle kjøringer havner i runs/log.jsonl
+issue med label factory ─→ triage ─→ test ─→ build ─→ review ─→ verify ─→ ship.sh: PR, CI, merge, deploy, sjekk i prod
+        ↑  watch.sh          agent     agent   agent    agent   vanlig kode
+        └──────────── monitor (agent) melder neste sak ───────────────────────────────────────────┘
+   Stopper et steg saken, får et menneske svaret som en kommentar i issuen.
+   Alle stegene leser factory/context.md, og alle kjøringer havner i runs/log.jsonl.
 ```
 
 ## Agenda
 
 | Del |
 |---|
-| Hva en programvarefabrikk er (lysbilde 1–10) |
-| Oppgave 0–1: oppsett og én feil du fikser selv |
-| Oppgave 2–7: stage.sh, triage, build, review, verify, ship |
-| Oppgave 8–11: run.sh, spec, overvåking, statistikk |
-| Oppgave 12–14: sjekk i nettleseren, dommer og benchmark |
-| Duell og diskusjon om det var verdt det |
+| Hva en programvarefabrikk er, og hva som skal til for å shippe uten å lese koden |
+| Oppgave 0–6: stage.sh, triage, test, build, review og verify |
+| Oppgave 7–12: fiks og ship med øynene lukket. Sjekk i nettleseren, ship.sh, run.sh, trigger fra en issue, overvåking og lur fabrikken |
+| Diskusjon: Stoler du på den? |
+| Ekstra: dommer og benchmark |
 
 ## Lysbilder
 
@@ -31,9 +31,12 @@ backlog/ ─→ triage ─→ (spec + menneske) ─→ build ─→ review ─�
 | Sti | Innhold |
 |---|---|
 | `workshop.html` | Lysbildene, med alle filene som heredocs du kan kopiere |
+| `bilder/` | Skjermbildet av Woltora som lysbildene bruker |
 | `solution/factory/` | Den ferdige fabrikken. Henger du etter? `cp solution/factory/<fil> factory/` |
+| `solution/copilot/stage.sh` | `stage.sh` for deg som bruker Copilot CLI i stedet for Claude Code |
 | `backlog/` | Feilrapporter fra brukere |
-| `.claude/settings.json` | Skjuler lysbildene, fasiten og fasilitatorguiden for agentene, så de ikke ser svarene |
+| `.github/workflows/ci.yml` | Tester hver pull request, og deployer `main` til GitHub Pages når testene er grønne |
+| `.claude/settings.json` | Skjuler lysbildene, fasiten og fasilitatorguiden for Claude Code, så agentene ikke ser svarene |
 | `src/` | Woltora. `npm test`, `npm run build`, `npm run dev` |
 
-Du trenger Node 24, `gh`, `jq`, Claude Code og Chrome (til Playwright MCP i oppgave 12). Fasilitatorer: Se [FACILITATOR.md](FACILITATOR.md).
+Du trenger Node 24, `gh`, Chrome (til Playwright MCP i oppgave 7) og enten Claude Code eller Copilot CLI. Repoet ditt må være offentlig, ellers krever GitHub Pages en betalt konto. Fasilitatorer: Se [FACILITATOR.md](FACILITATOR.md).

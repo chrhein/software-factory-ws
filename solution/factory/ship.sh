@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# Ship uten at noen leser koden: pull request, CI, merge, deploy og en sjekk i produksjon.
+# Ship uten at noen leser koden: pull request, CI, merge til main og en sjekk av main etterpå.
 # Bruk: factory/ship.sh <kjøremappe>
 set -euo pipefail
 run=$1
@@ -17,8 +17,7 @@ git switch -q main
 echo "CI kjører på $pr"
 ci "$sha" || { end ci "STOPPET: CI feilet på $pr"; exit 0; }
 gh pr merge "$pr" --squash --delete-branch && git pull -q
-echo "Merget. Venter på deploy …"
-ci "$(gh pr view "$pr" --json mergeCommit --jq .mergeCommit.oid)" || { end deploy "STOPPET: $pr er merget, men deploy feilet."; exit 0; }
-factory/check.sh "$run" "$(gh api 'repos/{owner}/{repo}/pages' --jq .html_url)"
-if head -1 "$run/check/5-check.md" | grep -q pass; then end ship "SHIPPET: $pr er i produksjon, og sjekken der gikk gjennom."
-else end prod "FEIL I PRODUKSJON: $pr er ute, men sjekken ser fortsatt feilen."; [ -z "$issue" ] || gh issue reopen "$issue" || true; fi
+echo "Merget. Sjekker main …"
+factory/check.sh "$run"
+if head -1 "$run/check/5-check.md" | grep -q pass; then end ship "SHIPPET: $pr er merget til main, og sjekken etterpå gikk gjennom."
+else end main "FEIL PÅ MAIN: $pr er merget, men sjekken ser fortsatt feilen."; [ -z "$issue" ] || gh issue reopen "$issue" || true; fi

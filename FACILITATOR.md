@@ -10,16 +10,16 @@
 3. Gjør en testkjøring i et nytt repo laget fra malen. Den tar et kvarter:
    ```bash
    gh repo create woltora-test --public --clone --template chrhein/software-factory-ws && cd woltora-test && npm ci && mkdir -p runs
-   gh api -X POST "repos/{owner}/{repo}/pages" -f build_type=workflow >/dev/null && gh label create factory && gh workflow run ci.yml
+   gh label create factory
    cp -r ../software-factory-ws/solution/factory . && git add factory && git commit -m factory && git push
-   factory/run.sh backlog/03-sok-skiller-store-sma.md     # hele veien til produksjon
+   factory/run.sh backlog/03-sok-skiller-store-sma.md     # hele veien til main
    factory/watch.sh                                        # i en egen fane, og lag så en issue fra appen
    gh issue create --label factory --title "For mange av samme rett" --body-file backlog/09-maks-antall.md
    ```
    Sak 09 skal stoppe med et utkast til en spec i issuen. Lim utkastet inn i beskrivelsen og sett på labelen igjen. Da skal triage si `automatable`. Stopp så `watch.sh`, og kjør `factory/learn.sh && git diff factory` for å se at læresteget finner issuen.
    Kjør den én gang til med `cp ../software-factory-ws/solution/copilot/stage.sh factory/` for å teste Copilot-varianten.
 
-   Sjekk særlig tre ting som ikke er testet mot ekte GitHub ennå: at `ship.sh` finner CI-kjøringen med `gh run list --commit`, at deployen til Pages er ferdig før sjekken i produksjon starter, og at knappen «Meld fra om en feil» setter labelen `factory`.
+   Sjekk særlig to ting som ikke er testet mot ekte GitHub ennå: at `ship.sh` finner CI-kjøringen med `gh run list --commit`, og at knappen «Meld fra om en feil» setter labelen `factory`. Kjør også steg 0.6 én gang, og se at deployen til Pages går gjennom når variabelen `PAGES` er satt.
 
 ## Copilot CLI er bare testet med en stub
 
@@ -44,7 +44,7 @@ Tallene er fra før fabrikken shippet selv, men stegene er de samme.
 | 04 sjekk i nettleseren | `CHECK: pass` med fiksen, `CHECK: fail` når fiksen var skjult | ca. 30 sekunder | ikke målt |
 | benchmark (to saker) | to kjøringer og to dommere, snitt 7,5. Dommeren ba om at review kjører testene selv | 2,5 minutter | ca. 1 dollar |
 
-I tillegg kommer test-steget, CI, deploy og sjekken i produksjon, så regn med tre til fire minutter per sak som shippes. Regn med 5–8 dollar per deltaker.
+I tillegg kommer test-steget, CI og sjekken etter merge, så regn med to til tre minutter per sak som shippes. Regn med 5–8 dollar per deltaker.
 
 ## Verdt å peke på
 
@@ -54,5 +54,5 @@ I tillegg kommer test-steget, CI, deploy og sjekken i produksjon, så regn med t
 - **Hvem skrev specen?** Triage stoler på en `## Spec` i beskrivelsen, men sjekker ikke hvem som skrev den. Alle som kan opprette eller redigere issuen, kan skrive sin egen. Spør hvordan en godkjenning burde se ut.
 - **Lærdommene hoper seg opp:** `LESSON:`-linjer havner i `factory/context.md` uten at noen ser over dem. Spør: Hvem bør godkjenne en endring i konteksten som alle stegene leser?
 - **Overvåkingen setter label selv:** Da går loopen uten noe menneske i det hele tatt. Spør om det er greit, og hvilke sperrer som må være på plass først.
-- **Sjekken i produksjon feiler:** `ship.sh` åpner issuen igjen, men endringen ligger fortsatt i produksjon. Spør om fabrikken burde reverte selv.
+- **Sjekken etter merge feiler:** `ship.sh` åpner issuen igjen, men endringen ligger fortsatt på `main`. Spør om fabrikken burde reverte selv.
 - **Dommeren er også en agent:** Den kan ta feil, og den gir gjerne 7 eller 8 uansett. Spør: Hvordan vet du at dommeren er god?

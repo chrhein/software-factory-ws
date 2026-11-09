@@ -5,7 +5,7 @@ En workshop på to timer for faggruppen AI-superbrukerne. Den bygger på Warp-ar
 Du bygger en loop som tar en feilmelding fra Woltora (demoappen fra workshopen om triggede agenter) helt ut i produksjon uten at noen leser koden. Underveis prøver du å lure hvert steg, så du vet hva du kan stole på.
 
 ```
-issue med label factory ─→ triage ─→ test ─→ build ─→ review ─→ verify ─→ ship.sh: PR, CI, merge, deploy, sjekk i prod
+issue med label factory ─→ triage ─→ test ─→ build ─→ review ─→ verify ─→ ship.sh: PR, CI, merge til main, sjekk etterpå
         ↑  watch.sh          agent     agent   agent    agent   vanlig kode
         └──────────── monitor (agent) melder neste sak ───────────────────────────────────────────┘
    Stopper et steg saken, får et menneske svaret som en kommentar i issuen.
@@ -31,10 +31,10 @@ issue med label factory ─→ triage ─→ test ─→ build ─→ review ─
 | Sti | Innhold |
 |---|---|
 | `workshop.html` | Lysbildene, med alle filene som heredocs du kan kopiere |
-| `bilder/` | Skjermbildet av Woltora som lysbildene bruker |
+| `bilder/` | Skjermbildene av Woltora og build.warp.dev som lysbildene bruker |
 | `backlog/` | Feilrapporter fra brukere |
-| `.github/workflows/ci.yml` | Tester hver pull request, og deployer `main` til GitHub Pages når testene er grønne |
+| `.github/workflows/ci.yml` | Tester hver pull request og hver push til `main`. Deployer `main` til GitHub Pages hvis du har skrudd det på (frivillig, oppgave 0.6) |
 | `.claude/settings.json` | Skjuler lysbildene, fasiten og fasilitatorguiden for Claude Code, så agentene ikke ser svarene |
 | `src/` | Woltora. `npm test`, `npm run build`, `npm run dev` |
 
-Du trenger Node 24, `gh`, Chrome (til Playwright MCP i oppgave 7) og enten Claude Code eller Copilot CLI. Repoet ditt må være offentlig, ellers krever GitHub Pages en betalt konto. Fasilitatorer: Se [FACILITATOR.md](FACILITATOR.md).
+Du trenger Node 24, `gh`, Chrome (til Playwright MCP i oppgave 7) og enten Claude Code eller Copilot CLI. Fasilitatorer: Se [FACILITATOR.md](FACILITATOR.md).

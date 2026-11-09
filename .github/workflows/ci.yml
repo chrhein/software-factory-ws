@@ -16,9 +16,9 @@ jobs:
       - run: npm test
       - run: npm run build
 
-  # Main går rett i produksjon på GitHub Pages når testene er grønne. Malen selv deployer ikke.
+  # Frivillig: Har du skrudd på GitHub Pages og satt variabelen PAGES (oppgave 0.6), deployes main dit når testene er grønne.
   deploy:
-    if: github.event_name != 'pull_request' && !github.event.repository.is_template
+    if: github.event_name != 'pull_request' && !github.event.repository.is_template && vars.PAGES == 'true'
     needs: test
     runs-on: ubuntu-latest
     permissions: { pages: write, id-token: write }

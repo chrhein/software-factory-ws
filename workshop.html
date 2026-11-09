@@ -162,6 +162,10 @@
   table.tight { margin-top: 16px; }
   table.tight th, table.tight td { padding-top: 7px; padding-bottom: 7px; }
   table.tight td:first-child { font: 12px var(--mono); color: var(--muted); width: 48px; }
+  table.levels td:last-child { position: relative; }
+  .level-img { position: absolute; right: 0; top: calc(100% + 8px); z-index: 2; width: min(400px, 60vw); height: auto; border-radius: 8px; box-shadow: 0 12px 32px rgb(0 0 0 / .25); opacity: 0; transform: translateY(4px); transition: opacity .2s, transform .2s; pointer-events: none; }
+  table.levels tr:nth-child(n+4) .level-img { top: auto; bottom: calc(100% + 8px); transform: translateY(-4px); }
+  table.levels tr:hover .level-img { opacity: 1; transform: none; }
 
   .chips { display: flex; gap: 10px; flex-wrap: wrap; margin-top: 36px; }
   .chip { display: flex; align-items: center; gap: 10px; padding: 10px 16px 10px 10px; border: 1px solid var(--line); border-radius: 999px; background: var(--white); font-size: 15px; }
@@ -295,7 +299,7 @@
       <h2 class="r" style="--i:1">Problemet en fabrikk skal løse</h2>
       <ul class="points">
         <li class="r" style="--i:2"><span>01</span><div>Agentene åpner flere pull requests enn folk rekker å lese, så review er blitt flaskehalsen. Skal det gå fortere, må du stole på noe annet enn at et menneske leser diffen.</div></li>
-        <li class="r" style="--i:3"><span>02</span><div>Én bot reviewer pull requests, og en annen prøver å fikse feil fra Sentry. De logger hver på sitt sted, så ingen kan svare på hva de har gjort, eller hvor mange av endringene deres som faktisk blir merget.</div></li>
+        <li class="r" style="--i:3"><span>02</span><div>Én bot reviewer pull requests, og en annen prøver å fikse feil fra loggene. De logger hver på sitt sted, så ingen kan svare på hva de har gjort, eller hvor mange av endringene deres som faktisk blir merget.</div></li>
         <li class="r" style="--i:4"><span>03</span><div>Hver agent er satt opp for seg, med sine egne tilganger og sin egen prompt. Det én agent lærer om repoet, får ikke de andre vite.</div></li>
       </ul>
       <p class="hint-line r" style="--i:5">Kilde: <a href="https://www.warp.dev/articles/what-is-a-software-factory" target="_blank">Warp, «What is a software factory?»</a>. Warp selger en slik fabrikk, så les artikkelen med det i bakhodet.</p>
@@ -305,7 +309,7 @@
   <section class="slide" data-part="Del 1 · Fabrikken">
     <div class="slide-inner">
       <h2 class="r" style="--i:1">Hva er en programvarefabrikk?</h2>
-      <svg class="flow r" style="--i:2" viewBox="0 66 1040 434" role="img" aria-label="Fabrikkloopen: En issue starter triage. Så skriver et steg en test som feiler, build fikser feilen, review leser diffen og verify kjører testene. CI tester og deployer, en agent sjekker appen i produksjon, og overvåkingen melder neste sak. Alle stegene deler kontekst, og alle kjøringer blir logget. Ingen mennesker leser koden.">
+      <svg class="flow r" style="--i:2" viewBox="0 66 1040 434" role="img" aria-label="Fabrikkloopen: En issue starter triage. Så skriver et steg en test som feiler, build fikser feilen, review leser diffen og verify kjører testene. CI tester og merger til main, en agent sjekker appen på main, og overvåkingen melder neste sak. Alle stegene deler kontekst, og alle kjøringer blir logget. Ingen mennesker leser koden.">
         <rect class="f-track" x="104" y="120" width="832" height="330" rx="36"/>
         <g class="f-head">
           <polygon points="201,111 217,120 201,129"/><polygon points="409,111 425,120 409,129"/><polygon points="617,111 633,120 617,129"/><polygon points="825,111 841,120 825,129"/>
@@ -315,15 +319,15 @@
         </g>
         <text class="f-side" x="120" y="291">neste sak</text>
 
-        <g class="f-human"><rect x="16" y="76" width="176" height="88"/><text x="104" y="114">Trigger</text><text class="f-sub" x="104" y="141">issue · Sentry · Slack</text></g>
+        <g class="f-human"><rect x="16" y="76" width="176" height="88"/><text x="104" y="114">Trigger</text><text class="f-sub" x="104" y="141">issue · loggene · Slack</text></g>
         <g class="f-agent"><rect x="224" y="76" width="176" height="88" rx="44"/><text x="312" y="114">Triage</text><text class="f-sub" x="312" y="141">reproduserer, avgjør</text></g>
         <g class="f-agent"><rect x="432" y="76" width="176" height="88" rx="44"/><text x="520" y="114">Test</text><text class="f-sub" x="520" y="141">beviser feilen</text></g>
         <g class="f-agent"><rect x="640" y="76" width="176" height="88" rx="44"/><text x="728" y="114">Build</text><text class="f-sub" x="728" y="141">skriver koden</text></g>
         <g class="f-agent"><rect x="848" y="76" width="176" height="88" rx="44"/><text x="936" y="114">Review</text><text class="f-sub" x="936" y="141">leser diffen</text></g>
 
         <g class="f-code"><rect x="848" y="406" width="176" height="88"/><text x="936" y="444">Verify</text><text class="f-sub" x="936" y="471">kjører testene</text></g>
-        <g class="f-code"><rect x="622" y="406" width="176" height="88"/><text x="710" y="444">CI og deploy</text><text class="f-sub" x="710" y="471">ut i produksjon</text></g>
-        <g class="f-agent"><rect x="396" y="406" width="176" height="88" rx="44"/><text x="484" y="444">Sjekk i prod</text><text class="f-sub" x="484" y="471">klikker i appen</text></g>
+        <g class="f-code"><rect x="622" y="406" width="176" height="88"/><text x="710" y="444">CI og merge</text><text class="f-sub" x="710" y="471">inn på main</text></g>
+        <g class="f-agent"><rect x="396" y="406" width="176" height="88" rx="44"/><text x="484" y="444">Sjekk av main</text><text class="f-sub" x="484" y="471">klikker i appen</text></g>
         <g class="f-agent"><rect x="170" y="406" width="176" height="88" rx="44"/><text x="258" y="444">Overvåking</text><text class="f-sub" x="258" y="471">melder neste sak</text></g>
 
         <rect class="f-hub" x="300" y="200" width="440" height="168" rx="12"/>
@@ -343,15 +347,15 @@
   <section class="slide" data-part="Del 1 · Fabrikken">
     <div class="slide-inner">
       <h2 class="r" style="--i:1">Fem nivåer av AI-programmering</h2>
-      <table class="tight r" style="--i:2">
+      <table class="tight levels r" style="--i:2">
         <thead><tr><th>Nivå</th><th>Navn</th><th>Slik jobber du</th></tr></thead>
         <tbody>
-          <tr><td>0</td><td>Autofullføring</td><td>Du tar imot forslag fra Copilot eller limer inn kode fra ChatGPT</td></tr>
-          <tr><td>1</td><td>Praktikant</td><td>AI skriver standardkode, og du leser alt</td></tr>
-          <tr><td>2</td><td>Juniorutvikler</td><td>Du parprogrammerer med modellen og leser hver linje</td></tr>
-          <tr><td>3</td><td>Utvikler</td><td>AI skriver det meste av koden, og du er reviewer på heltid</td></tr>
-          <tr><td>4</td><td>Utviklingsteam</td><td>Du lager spesifikasjoner og planer, og agentene gjør jobben</td></tr>
-          <tr class="today"><td>5</td><td>Dark factory</td><td>Agentene gjør spesifikasjoner om til programvare, og ingen leser koden</td></tr>
+          <tr><td>0</td><td>Autofullføring</td><td>Du tar imot forslag fra Copilot eller limer inn kode fra ChatGPT<img class="level-img" src="https://www.danshapiro.com/blog/wp-content/uploads/2026/01/image-768x424.png" alt="Dan Shapiros illustrasjon av nivå 0" width="768" height="424"></td></tr>
+          <tr><td>1</td><td>Praktikant</td><td>AI skriver standardkode, og du leser alt<img class="level-img" src="https://www.danshapiro.com/blog/wp-content/uploads/2026/01/image-1-768x424.png" alt="Dan Shapiros illustrasjon av nivå 1" width="768" height="424"></td></tr>
+          <tr><td>2</td><td>Juniorutvikler</td><td>Du parprogrammerer med modellen og leser hver linje<img class="level-img" src="https://www.danshapiro.com/blog/wp-content/uploads/2026/01/image-2-768x424.png" alt="Dan Shapiros illustrasjon av nivå 2" width="768" height="424"></td></tr>
+          <tr><td>3</td><td>Utvikler</td><td>AI skriver det meste av koden, og du er reviewer på heltid<img class="level-img" src="https://www.danshapiro.com/blog/wp-content/uploads/2026/01/image-3-768x424.png" alt="Dan Shapiros illustrasjon av nivå 3" width="768" height="424"></td></tr>
+          <tr><td>4</td><td>Utviklingsteam</td><td>Du lager spesifikasjoner og planer, og agentene gjør jobben<img class="level-img" src="https://www.danshapiro.com/blog/wp-content/uploads/2026/01/image-5-768x424.png" alt="Dan Shapiros illustrasjon av nivå 4" width="768" height="424"></td></tr>
+          <tr class="today"><td>5</td><td>Mørk programvarefabrikk</td><td>Agentene gjør spesifikasjoner om til programvare, og ingen leser koden<img class="level-img" src="https://www.danshapiro.com/blog/wp-content/uploads/2026/01/image-8-768x424.png" alt="Dan Shapiros illustrasjon av nivå 5" width="768" height="424"></td></tr>
         </tbody>
       </table>
       <p class="hint-line r" style="--i:3">De fleste av oss er på nivå 3 eller 4. I dag bygger du en liten versjon av nivå 5. Navnet kommer fra fabrikker der robotene gjør alt, så lyset kan være av. Kilde: <a href="https://www.danshapiro.com/blog/2026/01/the-five-levels-from-spicy-autocomplete-to-the-software-factory/" target="_blank">Dan Shapiro, «The Five Levels»</a>.</p>
@@ -360,16 +364,11 @@
 
   <section class="slide" data-part="Del 1 · Fabrikken">
     <div class="slide-inner">
-      <div class="kicker r" style="--i:0">Et eksempel på nivå 5</div>
-      <h2 class="r" style="--i:1">Slik jobber StrongDM</h2>
-      <p class="lead r" style="--i:2;max-width:none">StrongDM lager sikkerhetsprogramvare for tilgang til databaser og servere. AI-teamet har to regler: Kode skal ikke skrives av mennesker, og den skal ikke reviewes av mennesker.</p>
-      <ul class="points">
-        <li class="r" style="--i:3"><span>01</span><div>I stedet for review sjekker en LLM brukerhistorier fra start til slutt. Scenariene ligger utenfor kodebasen, omtrent som eksamensoppgaver, så agentene kan ikke skrive kode som bare består dem.</div></li>
-        <li class="r" style="--i:4"><span>02</span><div>I stedet for å telle grønne tester måler de hvor ofte brukeren trolig ville blitt fornøyd.</div></li>
-        <li class="r" style="--i:5"><span>03</span><div>Agenter har bygget kopier av Okta, Jira og Slack, så de kan kjøre tusenvis av scenarier i timen uten å røre de ekte tjenestene.</div></li>
-      </ul>
-      <p class="note r" style="--i:6;max-width:none">Vi låner to av ideene. Testen skrives av et annet steg enn fiksen, og sjekken i produksjon får bare se saken.</p>
-      <p class="hint-line r" style="--i:7">Kilder: <a href="https://factory.strongdm.ai/" target="_blank">StrongDM</a> og <a href="https://simonwillison.net/2026/feb/7/software-factory/" target="_blank">Simon Willison</a>, som spør hvordan dette kan være lurt når LLM-er gjør så rare feil.</p>
+      <div class="kicker r" style="--i:0">Et eksempel i drift</div>
+      <h2 class="r" style="--i:1">Slik jobber Warp</h2>
+      <p class="lead r" style="--i:2;max-width:none">Warp viser fabrikken sin offentlig. Hver issue går gjennom triage, spec, implementering og review, og under triage ser du om saken venter på agenten eller på et menneske.</p>
+      <a class="r" style="--i:3;display:block;margin-top:24px" href="https://build.warp.dev/" target="_blank"><img class="shot" style="width:auto;max-width:100%;max-height:40vh" src="bilder/warp-build.png" alt="Skjermbilde av build.warp.dev. Triaging har statusene Agent working, Awaiting agent, Needs mocks, Needs info og Awaiting maintainer, og under ligger Ready to spec og Creating spec. Til høyre står issues som venter på agenten." /></a>
+      <p class="hint-line r" style="--i:4">9. november ventet 1 897 saker på en maintainer og 137 på agenten, så den største køen er mennesker. Kilde: <a href="https://build.warp.dev/" target="_blank">build.warp.dev</a>. Klikk på bildet for å se tallene slik de er nå.</p>
     </div>
   </section>
 
@@ -377,12 +376,12 @@
     <div class="slide-inner">
       <h2 class="r" style="--i:1">Hva skal til for at du tør å shippe uten å lese koden?</h2>
       <ul class="points">
-        <li class="r" style="--i:2"><span>01</span><div><strong>Sperrer.</strong> Triage, test, review, verify, CI og sjekken i produksjon kan alle stoppe en endring. Du bygger dem én om gangen.</div></li>
+        <li class="r" style="--i:2"><span>01</span><div><strong>Sperrer.</strong> Triage, test, review, verify, CI og sjekken etter merge kan alle stoppe en endring. Du bygger dem én om gangen.</div></li>
         <li class="r" style="--i:3"><span>02</span><div><strong>Lur sperrene.</strong> Prøv å få en dårlig endring forbi hver sperre. Har du aldri sett en sperre stoppe en dårlig endring, kan du ikke stole på den.</div></li>
         <li class="r" style="--i:4"><span>03</span><div><strong>Vanlig kode.</strong> Agentene foreslår endringer, men det er tester, build og CI som bestemmer om de slipper gjennom.</div></li>
         <li class="r" style="--i:5"><span>04</span><div><strong>Unntak.</strong> Du ser bare saker som en sperre har stoppet. Da står svaret fra sperren som en kommentar i issuen.</div></li>
       </ul>
-      <p class="note r" style="--i:6">Ingen fabrikk er feilfri, så målet er at du har sett hver sperre stoppe en dårlig endring, at hver merge kan reverteres, og at sjekken i produksjon finner feil som tidligere sperrer slipper gjennom.</p>
+      <p class="note r" style="--i:6">Ingen fabrikk er feilfri, så målet er at du har sett hver sperre stoppe en dårlig endring, at hver merge kan reverteres, og at sjekken etter merge finner feil som tidligere sperrer slipper gjennom.</p>
     </div>
   </section>
 
@@ -416,9 +415,9 @@
       <h2 class="r" style="--i:1">Innhold i workshopen</h2>
       <table class="r" style="--i:2">
         <tbody>
-          <tr><td>Oppsett</td><td>Et eget repo der alt som merges til <code>main</code>, går rett i produksjon på GitHub Pages</td></tr>
+          <tr><td>Oppsett</td><td>Et eget repo der <code>main</code> er produksjon. GitHub Pages er frivillig.</td></tr>
           <tr><td>Deloppgaver</td><td>En motor som gir alle stegene samme kontekst og logger hver kjøring, og stegene som skriver testen, fikser feilen og stopper dårlige endringer. Du prøver å lure dem underveis.</td></tr>
-          <tr><td>Fiks og ship med øynene lukket</td><td>Du sender inn en feilmelding fra appen. Fabrikken fikser feilen, shipper fiksen til produksjon og sjekker den der, uten at noen har lest koden. Til slutt prøver du å lure hele fabrikken og ser hvilke sperrer som stoppet deg.</td></tr>
+          <tr><td>Fiks og ship med øynene lukket</td><td>Du sender inn en feilmelding fra appen. Fabrikken fikser feilen, merger fiksen til <code>main</code> og sjekker den etterpå, uten at noen har lest koden. Til slutt prøver du å lure hele fabrikken og ser hvilke sperrer som stoppet deg.</td></tr>
         </tbody>
       </table>
     </div>
@@ -445,7 +444,7 @@
       <div class="kicker r" style="--i:0">Oppgave 0 · Repoet</div>
       <h2 class="r" style="--i:1">Lag ditt eget repo fra malen</h2>
       <div class="steps">
-        <div class="step r" style="--i:2"><div class="step-num">0.3</div><div><p class="step-text">Repoet må være offentlig, ellers krever GitHub Pages en betalt konto.</p>
+        <div class="step r" style="--i:2"><div class="step-num">0.3</div><div><p class="step-text">Repoet er offentlig, så GitHub Pages er gratis hvis du vil bruke det i 0.6.</p>
           <div class="cmd"><span class="cmd-where">Terminal</span><pre>gh repo create woltora-factory --public --clone --template chrhein/software-factory-ws &amp;&amp; cd woltora-factory &amp;&amp; npm ci &amp;&amp; mkdir -p factory runs</pre><button class="copy" data-copy>Kopier</button></div></div></div>
         <div class="step r" style="--i:3"><div class="step-num">0.4</div><div><p class="step-text">Sjekk at testene og buildet går gjennom før du begynner</p>
           <div class="cmd"><span class="cmd-where">Terminal</span><pre>npm test &amp;&amp; npm run build</pre><button class="copy" data-copy>Kopier</button></div></div></div>
@@ -457,16 +456,14 @@
   <section class="slide" data-part="Del 2 · Bygg din egen fabrikk">
     <div class="slide-inner">
       <div class="kicker r" style="--i:0">Oppgave 0 · Produksjon</div>
-      <h2 class="r" style="--i:1">Sett opp produksjon på GitHub Pages</h2>
+      <h2 class="r" style="--i:1"><code>main</code> er produksjon</h2>
       <div class="steps">
-        <div class="step r" style="--i:2"><div class="step-num">0.5</div><div><p class="step-text">Skru på GitHub Pages for repoet</p>
-          <div class="cmd"><span class="cmd-where">Terminal</span><pre>gh api -X POST "repos/{owner}/{repo}/pages" -f build_type=workflow &gt;/dev/null</pre><button class="copy" data-copy>Kopier</button></div></div></div>
-        <div class="step r" style="--i:3"><div class="step-num">0.6</div><div><p class="step-text">Lag labelen fabrikken lytter på</p>
+        <div class="step r" style="--i:2"><div class="step-num">0.5</div><div><p class="step-text">Lag labelen fabrikken lytter på</p>
           <div class="cmd"><span class="cmd-where">Terminal</span><pre>gh label create factory</pre><button class="copy" data-copy>Kopier</button></div></div></div>
-        <div class="step r" style="--i:4"><div class="step-num">0.7</div><div><p class="step-text">Start den første deployen, vent til den er ferdig, og åpne appen i produksjon</p>
-          <div class="cmd"><span class="cmd-where">Terminal</span><pre>gh workflow run ci.yml &amp;&amp; sleep 5 &amp;&amp; gh run watch "$(gh run list -L 1 --json databaseId -q '.[0].databaseId')" &amp;&amp; open "$(gh api 'repos/{owner}/{repo}/pages' --jq .html_url)"</pre><button class="copy" data-copy>Kopier</button></div></div></div>
+        <div class="step r" style="--i:3"><div class="step-num">0.6</div><div><p class="step-text"><strong>Frivillig:</strong> Vil du ha appen på en ekte adresse, skrur du på GitHub Pages. Da deployer CI <code>main</code> dit etter hver merge.</p>
+          <div class="cmd"><span class="cmd-where">Terminal</span><pre>gh api -X POST "repos/{owner}/{repo}/pages" -f build_type=workflow &gt;/dev/null &amp;&amp; gh variable set PAGES --body true &amp;&amp; gh workflow run ci.yml</pre><button class="copy" data-copy>Kopier</button></div></div></div>
       </div>
-      <p class="note r" style="--i:5"><strong>Hvorfor:</strong> CI i malen deployer <code>main</code> til GitHub Pages hver gang testene er grønne. Fabrikken shipper ved å merge til <code>main</code>, så det som ligger der, er alltid det brukerne ser.</p>
+      <p class="note r" style="--i:4"><strong>Hvorfor:</strong> fabrikken shipper ved å merge til <code>main</code>, så det som ligger der, er det brukerne får. CI i malen kjører testene på hver pull request, så ingenting kommer inn på <code>main</code> uten grønne tester. Workshopen trenger ingen server, men med Pages kan du dele adressen og se fiksen live.</p>
     </div>
   </section>
 
@@ -667,7 +664,7 @@ EOF</pre><button class="copy" data-copy>Kopier</button></div></div></div>
         <div class="step r" style="--i:3"><div class="step-num">3.2</div><div><p class="step-text">Kjør den på <code>t1</code>. Nå skal <code>npm test</code> feile. Det betyr at testen fanger feilen.</p>
           <div class="cmd"><span class="cmd-where">Terminal</span><pre>factory/stage.sh 2-test runs/t1; git status --short src; npm test</pre><button class="copy" data-copy>Kopier</button></div></div></div>
       </div>
-      <p class="note r" style="--i:4"><strong>Hvorfor:</strong> skriver samme agent både testen og fiksen, retter den sin egen prøve. Her skriver ett steg testen, og build får ikke endre den. Det er en enkel variant av ideen til StrongDM, der agenten som skriver koden, ikke får bestemme hva som teller som riktig.</p>
+      <p class="note r" style="--i:4"><strong>Hvorfor:</strong> skriver samme agent både testen og fiksen, retter den sin egen prøve. Her skriver ett steg testen, og build får ikke endre den. Da får ikke agenten som skriver koden, bestemme hva som teller som riktig.</p>
     </div>
   </section>
 
@@ -835,7 +832,7 @@ fi
 factory/stage.sh 5-check "$dir"
 EOF</pre><button class="copy" data-copy>Kopier</button></div></div></div>
       </div>
-      <p class="note r" style="--i:3"><strong>Hvorfor:</strong> det samme skriptet sjekker appen lokalt nå og i produksjon etter hver deploy i oppgave 8. Agenten får en tom mappe med bare saken og adressen, så den vet ikke hva de andre stegene har skrevet.</p>
+      <p class="note r" style="--i:3"><strong>Hvorfor:</strong> det samme skriptet sjekker <code>main</code> etter hver merge i oppgave 8. Agenten får en tom mappe med bare saken og adressen, så den vet ikke hva de andre stegene har skrevet.</p>
     </div>
   </section>
 
@@ -858,10 +855,10 @@ EOF</pre><button class="copy" data-copy>Kopier</button></div></div></div>
       <div class="kicker r" style="--i:0">Oppgave 8 · Ship</div>
       <h2 class="r" style="--i:1">Lag ship-skriptet</h2>
       <div class="steps">
-        <div class="step r" style="--i:2"><div class="step-num">8.1</div><div><p class="step-text"><code>ship.sh</code> lager en pull request, venter på CI, merger, venter på deployen og sjekker appen i produksjon.</p>
+        <div class="step r" style="--i:2"><div class="step-num">8.1</div><div><p class="step-text"><code>ship.sh</code> lager en pull request, venter på CI, merger til <code>main</code> og sjekker appen på <code>main</code> etterpå.</p>
           <div class="cmd file"><span class="cmd-where">Terminal</span><pre>cat &gt; factory/ship.sh &lt;&lt;'EOF' &amp;&amp; chmod +x factory/ship.sh
 #!/usr/bin/env bash
-# Ship uten at noen leser koden: pull request, CI, merge, deploy og en sjekk i produksjon.
+# Ship uten at noen leser koden: pull request, CI, merge til main og en sjekk av main etterpå.
 # Bruk: factory/ship.sh &lt;kjøremappe&gt;
 set -euo pipefail
 run=$1
@@ -879,14 +876,13 @@ git switch -q main
 echo "CI kjører på $pr"
 ci "$sha" || { end ci "STOPPET: CI feilet på $pr"; exit 0; }
 gh pr merge "$pr" --squash --delete-branch &amp;&amp; git pull -q
-echo "Merget. Venter på deploy …"
-ci "$(gh pr view "$pr" --json mergeCommit --jq .mergeCommit.oid)" || { end deploy "STOPPET: $pr er merget, men deploy feilet."; exit 0; }
-factory/check.sh "$run" "$(gh api 'repos/{owner}/{repo}/pages' --jq .html_url)"
-if head -1 "$run/check/5-check.md" | grep -q pass; then end ship "SHIPPET: $pr er i produksjon, og sjekken der gikk gjennom."
-else end prod "FEIL I PRODUKSJON: $pr er ute, men sjekken ser fortsatt feilen."; [ -z "$issue" ] || gh issue reopen "$issue" || true; fi
+echo "Merget. Sjekker main …"
+factory/check.sh "$run"
+if head -1 "$run/check/5-check.md" | grep -q pass; then end ship "SHIPPET: $pr er merget til main, og sjekken etterpå gikk gjennom."
+else end main "FEIL PÅ MAIN: $pr er merget, men sjekken ser fortsatt feilen."; [ -z "$issue" ] || gh issue reopen "$issue" || true; fi
 EOF</pre><button class="copy" data-copy>Kopier</button></div></div></div>
       </div>
-      <p class="note r" style="--i:3"><strong>Hvorfor:</strong> i dag er det et menneske som leser diffen, trykker merge og følger med på deployen. <code>ship.sh</code> gjør det samme uten deg, men merger bare når CI er grønn, og sjekker appen i produksjon etterpå. Feiler sjekken, åpner <code>ship.sh</code> issuen igjen, så saken ikke blir borte.</p>
+      <p class="note r" style="--i:3"><strong>Hvorfor:</strong> i dag er det et menneske som leser diffen, trykker merge og sjekker at det virker. <code>ship.sh</code> gjør det samme uten deg, men merger bare når CI er grønn, og sjekker appen på <code>main</code> etterpå. Feiler sjekken, åpner <code>ship.sh</code> issuen igjen, så saken ikke blir borte.</p>
     </div>
   </section>
 
@@ -895,12 +891,12 @@ EOF</pre><button class="copy" data-copy>Kopier</button></div></div></div>
       <div class="kicker r" style="--i:0">Oppgave 8 · fortsettelse</div>
       <h2 class="r" style="--i:1">Ship uten at noen leser koden</h2>
       <div class="steps">
-        <div class="step r" style="--i:2"><div class="step-num">8.2</div><div><p class="step-text">Ship <code>t1</code> uten å lese diffen. Følg med i terminalen og på GitHub. Det tar tre til fire minutter.</p>
+        <div class="step r" style="--i:2"><div class="step-num">8.2</div><div><p class="step-text">Ship <code>t1</code> uten å lese diffen. Følg med i terminalen og på GitHub. Det tar to til tre minutter.</p>
           <div class="cmd"><span class="cmd-where">Terminal</span><pre>factory/ship.sh runs/t1</pre><button class="copy" data-copy>Kopier</button></div></div></div>
-        <div class="step r" style="--i:3"><div class="step-num">8.3</div><div><p class="step-text">Åpne appen i produksjon, og se selv at feilen er borte</p>
-          <div class="cmd"><span class="cmd-where">Terminal</span><pre>open "$(gh api 'repos/{owner}/{repo}/pages' --jq .html_url)"</pre><button class="copy" data-copy>Kopier</button></div></div></div>
+        <div class="step r" style="--i:3"><div class="step-num">8.3</div><div><p class="step-text">Start appen fra <code>main</code>, og se selv at feilen er borte. La den gå i en egen fane resten av workshopen. <small>(Har du skrudd på Pages, kan du åpne adressen derfra i stedet.)</small></p>
+          <div class="cmd"><span class="cmd-where">Terminal</span><pre>npm run dev -- --open</pre><button class="copy" data-copy>Kopier</button></div></div></div>
       </div>
-      <p class="note r" style="--i:4"><strong>Hvorfor:</strong> ingen leser koden, så tilliten ligger i sperrene foran. CI kjører testene på nytt på en ren maskin, og sjekken i produksjon tester det brukerne faktisk får.</p>
+      <p class="note r" style="--i:4"><strong>Hvorfor:</strong> ingen leser koden, så tilliten ligger i sperrene foran. CI kjører testene på nytt på en ren maskin, og sjekken etter merge tester det som faktisk ligger på <code>main</code>.</p>
     </div>
   </section>
 
@@ -923,7 +919,7 @@ EOF</pre><button class="copy" data-copy>Kopier</button></div></div></div>
         <g class="f-code"><rect x="745" y="40" width="124" height="80"/><text x="807" y="75">Verify</text><text class="f-sub" x="807" y="100">verify.sh</text></g>
         <g class="f-code"><rect x="894" y="40" width="124" height="80"/><text x="956" y="75">Ship</text><text class="f-sub" x="956" y="100">ship.sh</text></g>
         <g class="f-human"><rect x="149" y="240" width="720" height="80"/><text x="509" y="275">STOPPET</text><text class="f-sub" x="509" y="300">endringen blir kastet, og et menneske får svaret i issuen</text></g>
-        <g class="f-human"><rect x="894" y="240" width="124" height="80"/><text x="956" y="275">SHIPPET</text><text class="f-sub" x="956" y="300">sjekket i prod</text></g>
+        <g class="f-human"><rect x="894" y="240" width="124" height="80"/><text x="956" y="275">SHIPPET</text><text class="f-sub" x="956" y="300">sjekket på main</text></g>
         <rect class="f-hub" x="0" y="356" width="1018" height="56" rx="12"/>
         <text class="f-hub-label" x="509" y="389">Hvert steg skriver en linje til runs/log.jsonl</text>
       </svg>
@@ -1019,9 +1015,9 @@ EOF</pre><button class="copy" data-copy>Kopier</button></div></div></div>
       <div class="steps">
         <div class="step r" style="--i:2"><div class="step-num">10.2</div><div><p class="step-text">Start den i en egen fane, og la den gå resten av workshopen. Ikke kjør <code>run.sh</code> i en annen fane mens den jobber, siden begge bruker <code>src/</code>.</p>
           <div class="cmd"><span class="cmd-where">Terminal</span><pre>factory/watch.sh</pre><button class="copy" data-copy>Kopier</button></div></div></div>
-        <div class="step r" style="--i:3"><div class="step-num">10.3</div><div><p class="step-text">Åpne appen i produksjon, legg noe i handlekurven og trykk «Meld fra om en feil». Skriv at «Totalt» ikke tar med frakten, og lagre issuen. Labelen <code>factory</code> er allerede satt. <small>(Du kan også lage issuen fra terminalen.)</small></p>
+        <div class="step r" style="--i:3"><div class="step-num">10.3</div><div><p class="step-text">Gå til appen fra 8.3, legg noe i handlekurven og trykk «Meld fra om en feil». Skriv at «Totalt» ikke tar med frakten, og lagre issuen. Labelen <code>factory</code> er allerede satt. <small>(Du kan også lage issuen fra terminalen.)</small></p>
           <div class="cmd"><span class="cmd-where">Terminal</span><pre>gh issue create --label factory --title "Totalt tar ikke med frakt" --body-file backlog/02-totalt-uten-frakt.md</pre><button class="copy" data-copy>Kopier</button></div></div></div>
-        <div class="step r" style="--i:4"><div class="step-num">10.4</div><div><p class="step-text">Følg med i fanen med <code>watch.sh</code>. Når den er ferdig, står resultatet som en kommentar i issuen, og fiksen er i produksjon.</p></div></div>
+        <div class="step r" style="--i:4"><div class="step-num">10.4</div><div><p class="step-text">Følg med i fanen med <code>watch.sh</code>. Når den er ferdig, står resultatet som en kommentar i issuen, og fiksen er merget til <code>main</code>.</p></div></div>
       </div>
       <p class="note r" style="--i:5"><strong>Hvorfor:</strong> nå trenger du ikke terminalen for å starte fabrikken. En feilmelding fra appen er nok.</p>
     </div>
@@ -1305,7 +1301,7 @@ EOF</pre><button class="copy" data-copy>Kopier</button></div></div></div>
         <li class="r" style="--i:3"><span>02</span><div>Leste du diffen likevel? Hva fikk deg til å gjøre det?</div></li>
         <li class="r" style="--i:4"><span>03</span><div>Hva må til i prosjektet ditt før dette er trygt nok? Rollback, volum, risiko?</div></li>
         <li class="r" style="--i:5"><span>04</span><div>Hvem bør godkjenne en regel i <code>context.md</code>, når alle stegene leser den? Læresteget lager regler fra beskrivelser som forfatteren av en issue kan redigere. Hvem bør godkjenne dem?</div></li>
-        <li class="r" style="--i:6"><span>05</span><div>Hva burde fabrikken gjøre når sjekken i produksjon feiler?</div></li>
+        <li class="r" style="--i:6"><span>05</span><div>Hva burde fabrikken gjøre når sjekken etter merge feiler?</div></li>
         <li class="r" style="--i:7"><span>06</span><div>Hva er den minste biten av dette du ville tatt i bruk på mandag?</div></li>
       </ul>
     </div>
@@ -1317,10 +1313,10 @@ EOF</pre><button class="copy" data-copy>Kopier</button></div></div></div>
       <table class="r" style="--i:2">
         <thead><tr><th>Vår fabrikk</th><th>Neste steg</th><th>Hvorfor det betyr noe</th></tr></thead>
         <tbody>
-          <tr><td><code>watch.sh</code> på laptopen din</td><td>En kjøring i skyen per sak, startet av issues, Slack eller Sentry</td><td>Fabrikken jobber mens laptopen er lukket</td></tr>
+          <tr><td><code>watch.sh</code> på laptopen din</td><td>En kjøring i skyen per sak, startet av issues, Slack eller loggene</td><td>Fabrikken jobber mens laptopen er lukket</td></tr>
           <tr><td>Overvåking som leser <code>src/lib/</code></td><td>Exceptions fra PostHog blir nye issues med label <code>factory</code></td><td>Appen sender allerede feil til PostHog, så fabrikken kan starte fra ekte feil</td></tr>
           <tr><td>Én kjøring om gangen</td><td>En worktree eller en sandkasse per kjøring</td><td>Mange saker samtidig</td></tr>
-          <tr><td>Sjekk i produksjon etter deploy</td><td>Et preview-miljø per pull request, og automatisk revert når sjekken feiler</td><td>Feilen blir fanget før brukerne ser den</td></tr>
+          <tr><td><code>main</code> er produksjon</td><td>Deploy til et ekte miljø, et preview-miljø per pull request og automatisk revert når sjekken feiler</td><td>Feilen blir fanget før brukerne ser den</td></tr>
           <tr><td>Testen skrives av et eget steg</td><td>Scenarier utenfor repoet som kodeagentene aldri ser, slik StrongDM gjør</td><td>Agentene kan ikke tilpasse seg sjekkene</td></tr>
           <tr><td>Din egen innlogging</td><td>Én felles tilgang og ett revisjonsspor, uansett modell</td><td>Du ser hvem som gjorde hva, og kan bytte modell</td></tr>
         </tbody>
@@ -1338,6 +1334,7 @@ EOF</pre><button class="copy" data-copy>Kopier</button></div></div></div>
         <a href="https://www.danshapiro.com/blog/2026/01/the-five-levels-from-spicy-autocomplete-to-the-software-factory/" target="_blank"><small>Dan Shapiro</small>The Five Levels ↗</a>
         <a href="https://simonwillison.net/2025/Jun/16/the-lethal-trifecta/" target="_blank"><small>Simon Willison</small>The lethal trifecta ↗</a>
         <a href="https://www.warp.dev/articles/what-is-a-software-factory" target="_blank"><small>Warp</small>What is a software factory? ↗</a>
+        <a href="https://build.warp.dev/" target="_blank"><small>Warp</small>Fabrikken deres, live ↗</a>
         <a href="https://mastra.ai/factory" target="_blank"><small>Mastra</small>Factory, en ferdigpakket fabrikk ↗</a>
         <a href="https://github.com/chrhein/autonomous-agents-ws" target="_blank"><small>Forrige workshop</small>Triggede agenter ↗</a>
       </div>

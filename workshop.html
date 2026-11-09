@@ -379,11 +379,11 @@
       <h2 class="r" style="--i:1">Hva skal til for at du tør å shippe uten å lese koden?</h2>
       <ul class="points">
         <li class="r" style="--i:2"><span>01</span><div><strong>Sperrer.</strong> Triage, test, review, verify, CI og sjekken i produksjon kan alle stoppe en endring. Du bygger dem én om gangen.</div></li>
-        <li class="r" style="--i:3"><span>02</span><div><strong>Lur dem.</strong> Du prøver å få en dårlig endring forbi hver sperre. Har du aldri sett en sperre stoppe noe, kan du ikke stole på den.</div></li>
+        <li class="r" style="--i:3"><span>02</span><div><strong>Lur sperrene.</strong> Prøv å få en dårlig endring forbi hver sperre. Har du aldri sett en sperre stoppe en dårlig endring, kan du ikke stole på den.</div></li>
         <li class="r" style="--i:4"><span>03</span><div><strong>Vanlig kode.</strong> Agentene foreslår endringer, men det er tester, build og CI som bestemmer om de slipper gjennom.</div></li>
-        <li class="r" style="--i:5"><span>04</span><div><strong>Unntak.</strong> Du får bare saken når en sperre stopper den. Svaret kommer da som en kommentar i issuen.</div></li>
+        <li class="r" style="--i:5"><span>04</span><div><strong>Unntak.</strong> Du ser bare saker som en sperre har stoppet. Da står svaret fra sperren som en kommentar i issuen.</div></li>
       </ul>
-      <p class="note r" style="--i:6">Ingen fabrikk er feilfri, så målet er at du har sett hver sperre stoppe en dårlig endring, at hver merge kan reverteres, og at sjekken i produksjon finner det som slipper gjennom.</p>
+      <p class="note r" style="--i:6">Ingen fabrikk er feilfri, så målet er at du har sett hver sperre stoppe en dårlig endring, at hver merge kan reverteres, og at sjekken i produksjon finner feil som tidligere sperrer slipper gjennom.</p>
     </div>
   </section>
 
@@ -391,7 +391,7 @@
     <div class="slide-inner split">
       <div>
         <h2 class="r" style="--i:1">Hva fabrikken består av</h2>
-        <p class="lead r" style="--i:2">Fabrikken er noen bash-skript og prompter i markdown i mappen <code>factory/</code>, og agenten kjører med <code>claude -p</code> eller <code>copilot -p</code> på din egen maskin. Promptene sier hva agenten skal gjøre i hvert steg. Skriptene kjører stegene og avgjør om en endring slipper gjennom.</p>
+        <p class="lead r" style="--i:2">Fabrikken er en mappe, <code>factory/</code>, med prompter i markdown og noen bash-skript. Hver prompt beskriver ett steg, for eksempel triage eller review. Skriptene sender promptene i rekkefølge til en agent (<code>claude -p</code> eller <code>copilot -p</code>) på din egen maskin, og stopper saken ved første sperre som sier nei. To av sperrene, verify og CI, er vanlig kode som ikke stoler på det agentene sier.</p>
       </div>
       <ul class="stack">
         <li class="r" style="--i:3"><span>Kontekst</span><div><code>factory/context.md</code>, som alle stegene leser</div></li>
@@ -419,7 +419,7 @@
         <tbody>
           <tr><td>Oppsett</td><td>Et eget repo der alt som merges til <code>main</code>, går rett i produksjon på GitHub Pages</td></tr>
           <tr><td>Deloppgaver</td><td>En motor som gir alle stegene samme kontekst og logger hver kjøring, og stegene som skriver testen, fikser feilen og stopper dårlige endringer. Du prøver å lure dem underveis.</td></tr>
-          <tr><td>Fiks og ship med øynene lukket</td><td>En feilmelding fra appen som går helt ut i produksjon og blir sjekket der, uten at noen har lest koden. Til slutt prøver du å lure hele fabrikken og ser hva sperrene stoppet.</td></tr>
+          <tr><td>Fiks og ship med øynene lukket</td><td>Du sender inn en feilmelding fra appen. Fabrikken fikser feilen, shipper fiksen til produksjon og sjekker den der, uten at noen har lest koden. Til slutt prøver du å lure hele fabrikken og ser hvilke sperrer som stoppet deg.</td></tr>
         </tbody>
       </table>
     </div>
@@ -576,7 +576,7 @@ grep '^LESSON:' "$run/$stage.md" | sed 's/^LESSON: */- /' &gt;&gt; factory/conte
 cat "$run/$stage.md"
 EOF</pre><button class="copy" data-copy>Kopier</button></div></div></div>
       </div>
-      <p class="note r" style="--i:4"><strong>Hvorfor:</strong> når du starter en agent for hånd, kan den bruke alle verktøyene du har gitt den lov til, og ingen logger hva den gjorde. <code>stage.sh</code> kjører hvert steg på samme måte, med samme kontekst, en linje i loggen og bare verktøyene steget trenger. <span data-only="claude"><code>--permission-mode dontAsk</code> avviser alt annet uten å spørre. Det håndheves av Claude Code, så det virker selv om prompten blir lurt.</span><span data-only="copilot">Med <code>-p</code> avviser Copilot alt som ikke står i <code>--allow-tool</code>, og <code>--deny-tool</code> stopper build fra å endre testene. Det håndheves av Copilot, så det virker selv om prompten blir lurt.</span></p>
+      <p class="note r" style="--i:4"><strong>Hvorfor:</strong> starter du en agent for hånd, kan den bruke alle verktøyene du noen gang har gitt den lov til, og du har ingen oversikt over hva den gjorde. <code>stage.sh</code> gir hvert steg den samme konteksten og bare verktøyene steget trenger. Hvert steg lagrer også svaret i en fil og skriver en linje i loggen. <span data-only="claude">Med <code>--permission-mode dontAsk</code> blir alle andre verktøy avvist uten at agenten spør deg. Det er Claude Code som håndhever dette, ikke prompten.</span><span data-only="copilot">Med <code>-p</code> avviser Copilot alle verktøy som ikke står i <code>--allow-tool</code>, og <code>--deny-tool</code> stopper build fra å endre testene. Det er Copilot som håndhever dette, ikke prompten.</span> Selv om noen lurer agenten med tekst i en sak, kan den ikke bruke verktøy den ikke har fått.</p>
     </div>
   </section>
 
@@ -1037,7 +1037,7 @@ EOF</pre><button class="copy" data-copy>Kopier</button></div></div></div>
         <div class="step r" style="--i:3"><div class="step-num">12.2</div><div><p class="step-text">Send den uklare saken. Fabrikken svarer med spørsmål i issuen.</p>
           <div class="cmd"><span class="cmd-where">Terminal</span><pre>gh issue create --label factory --title "For mange av samme rett" --body-file backlog/09-maks-antall.md</pre><button class="copy" data-copy>Kopier</button></div></div></div>
       </div>
-      <p class="note r" style="--i:4"><strong>Hvorfor:</strong> nå møter alle sperrene saken samtidig, slik de ville gjort med en ekte sak. Kommentaren i issuen viser hvilket steg som stoppet den.</p>
+      <p class="note r" style="--i:4"><strong>Hvorfor:</strong> tidligere testet du angrepet mot én sperre. Nå tester vi angrepet gjennom hele fabrikken, slik en ekte sak ville gjort, og må komme forbi alle sperrene etter tur. Kommentaren i issuen viser hvilken sperre som stoppet det.</p>
     </div>
   </section>
 

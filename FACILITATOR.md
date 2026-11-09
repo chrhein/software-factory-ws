@@ -11,11 +11,11 @@
    ```bash
    gh repo create woltora-test --public --clone --template chrhein/software-factory-ws && cd woltora-test && npm ci && mkdir -p runs
    gh api -X POST "repos/{owner}/{repo}/pages" -f build_type=workflow >/dev/null && gh label create factory && gh workflow run ci.yml
-   cp -r ../software-factory-workshop/solution/factory . && git add factory && git commit -m factory && git push
+   cp -r ../software-factory-ws/solution/factory . && git add factory && git commit -m factory && git push
    factory/run.sh backlog/03-sok-skiller-store-sma.md     # hele veien til produksjon
    factory/watch.sh                                        # i en egen fane, og lag så en issue fra appen
    ```
-   Kjør den én gang til med `cp ../software-factory-workshop/solution/copilot/stage.sh factory/` for å teste Copilot-varianten.
+   Kjør den én gang til med `cp ../software-factory-ws/solution/copilot/stage.sh factory/` for å teste Copilot-varianten.
 
    Sjekk særlig tre ting som ikke er testet mot ekte GitHub ennå: at `ship.sh` finner CI-kjøringen med `gh run list --commit`, at deployen til Pages er ferdig før sjekken i produksjon starter, og at knappen «Meld fra om en feil» setter labelen `factory`.
 

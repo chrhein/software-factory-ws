@@ -1,6 +1,6 @@
 # Bygg en programvarefabrikk
 
-En workshop på to timer for faggruppen for avansert AI. Den bygger på Warp-artikkelen [«What is a software factory?»](https://www.warp.dev/articles/what-is-a-software-factory) og på hvordan [StrongDM shipper uten å lese koden](https://simonwillison.net/2026/feb/7/software-factory/).
+En workshop på to timer for faggruppen AI-superbrukerne. Den bygger på Warp-artikkelen [«What is a software factory?»](https://www.warp.dev/articles/what-is-a-software-factory) og på hvordan [StrongDM shipper uten å lese koden](https://simonwillison.net/2026/feb/7/software-factory/).
 
 Du bygger en loop som tar en feilmelding fra Woltora (demoappen fra workshopen om triggede agenter) helt ut i produksjon uten at noen leser koden. Underveis prøver du å lure hvert steg, så du vet hva du kan stole på.
 
@@ -20,7 +20,7 @@ issue med label factory ─→ triage ─→ test ─→ build ─→ review ─
 | Oppgave 0–6: stage.sh, triage, test, build, review og verify |
 | Oppgave 7–12: fiks og ship med øynene lukket. Sjekk i nettleseren, ship.sh, run.sh, trigger fra en issue, overvåking og lur fabrikken |
 | Diskusjon: Stoler du på den? |
-| Ekstra: dommer og benchmark |
+| Ekstra: dommer, benchmark og en fabrikk som lærer |
 
 ## Lysbilder
 
@@ -32,8 +32,6 @@ issue med label factory ─→ triage ─→ test ─→ build ─→ review ─
 |---|---|
 | `workshop.html` | Lysbildene, med alle filene som heredocs du kan kopiere |
 | `bilder/` | Skjermbildet av Woltora som lysbildene bruker |
-| `solution/factory/` | Den ferdige fabrikken. Henger du etter? `cp solution/factory/<fil> factory/` |
-| `solution/copilot/stage.sh` | `stage.sh` for deg som bruker Copilot CLI i stedet for Claude Code |
 | `backlog/` | Feilrapporter fra brukere |
 | `.github/workflows/ci.yml` | Tester hver pull request, og deployer `main` til GitHub Pages når testene er grønne |
 | `.claude/settings.json` | Skjuler lysbildene, fasiten og fasilitatorguiden for Claude Code, så agentene ikke ser svarene |

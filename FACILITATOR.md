@@ -14,7 +14,9 @@
    cp -r ../software-factory-workshop/solution/factory . && git add factory && git commit -m factory && git push
    factory/run.sh backlog/03-sok-skiller-store-sma.md     # hele veien til produksjon
    factory/watch.sh                                        # i en egen fane, og lag så en issue fra appen
+   gh issue create --label factory --title "For mange av samme rett" --body-file backlog/09-maks-antall.md
    ```
+   Sak 09 skal stoppe med et utkast til en spec i issuen. Lim utkastet inn i beskrivelsen og sett på labelen igjen. Da skal triage si `automatable`. Stopp så `watch.sh`, og kjør `factory/learn.sh && git diff factory` for å se at læresteget finner issuen.
    Kjør den én gang til med `cp ../software-factory-workshop/solution/copilot/stage.sh factory/` for å teste Copilot-varianten.
 
    Sjekk særlig tre ting som ikke er testet mot ekte GitHub ennå: at `ship.sh` finner CI-kjøringen med `gh run list --commit`, at deployen til Pages er ferdig før sjekken i produksjon starter, og at knappen «Meld fra om en feil» setter labelen `factory`.
@@ -27,6 +29,7 @@
 - At `--deny-tool='write(meny.test.ts),…'` vinner over `--allow-tool=write` i build-steget. Dokumentasjonen sier ikke hva som vinner.
 - At `shell(git diff)` også slipper gjennom `git diff` med argumenter, ellers ser ikke review og dommeren diffen.
 - At `copilot -p` kjører i et repo som ikke er godkjent interaktivt først. Hvis ikke, må deltakerne kjøre `copilot` én gang i repoet.
+- At `write(1-triage.md)` og `write(context.md)` i `8-learn` slipper gjennom endringer i `factory/1-triage.md` og `factory/context.md`. Hvis ikke, ender læresteget alltid med `LEARN: nothing`.
 - Deny-lista i `.claude/settings.json` gjelder bare Claude Code. Copilot-agentene kan lese `workshop.html` og `solution/`.
 
 ## Slik gikk en testkjøring (5. november 2026, Opus)
@@ -48,6 +51,7 @@ I tillegg kommer test-steget, CI, deploy og sjekken i produksjon, så regn med t
 - **Ingen leser koden:** Spør hvem som likevel åpnet diffen, og hva som fikk dem til det. Det svaret sier hvilken sperre de ikke stoler på.
 - **Test-steget og build:** Build kan ikke endre testfiler, fordi `stage.sh` nekter det med `--disallowedTools`. Det håndheves av Claude Code, så det virker selv om prompten blir lurt.
 - **Labelen er tilgangskontrollen:** Bare folk med skrivetilgang kan sette `factory`. Men forfatteren av en issue kan endre teksten etter at labelen er satt. Spør hva det betyr.
+- **Hvem skrev specen?** Triage stoler på en `## Spec` i beskrivelsen, men sjekker ikke hvem som skrev den. Alle som kan opprette eller redigere issuen, kan skrive sin egen. Spør hvordan en godkjenning burde se ut.
 - **Lærdommene hoper seg opp:** `LESSON:`-linjer havner i `factory/context.md` uten at noen ser over dem. Spør: Hvem bør godkjenne en endring i konteksten som alle stegene leser?
 - **Overvåkingen setter label selv:** Da går loopen uten noe menneske i det hele tatt. Spør om det er greit, og hvilke sperrer som må være på plass først.
 - **Sjekken i produksjon feiler:** `ship.sh` åpner issuen igjen, men endringen ligger fortsatt i produksjon. Spør om fabrikken burde reverte selv.

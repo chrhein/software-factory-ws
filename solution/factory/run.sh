@@ -12,6 +12,10 @@ stop() { git restore src && git clean -fdq src; { echo "STOPPET: $2"; echo; cat 
 trap 'stop krasj "et steg krasjet." /dev/null' ERR
 
 step 1-triage
+if head -1 "$run/1-triage.md" | grep -q needs-spec; then
+  step 1-spec
+  stop spec "saken trenger en spec. Rett utkastet, lim det inn i beskrivelsen og sett på labelen factory igjen." "$run/1-spec.md"
+fi
 head -1 "$run/1-triage.md" | grep -q automatable || stop triage "triage vil at et menneske ser på saken." "$run/1-triage.md"
 step 2-test
 step 3-build

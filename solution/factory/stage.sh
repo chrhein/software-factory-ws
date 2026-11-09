@@ -8,6 +8,7 @@ case $stage in
   3-build)   tools="Read,Glob,Grep,Edit(src/**),Bash(npm test:*),Bash(npm run build:*)"; deny="Edit(src/**/*.test.ts)" ;;
   5-check)   tools="mcp__playwright"; mcp=factory/mcp.json ;;
   6-monitor) tools="Read,Glob,Grep,Bash(gh issue list:*)" ;;
+  8-learn)   tools="Read,Glob,Grep,Edit(factory/*.md)"; deny="Edit(factory/7-judge.md),Edit(factory/8-learn.md)" ;;
   *)         tools="Read,Glob,Grep,Bash(git diff:*),Bash(git status:*),Bash(npm test:*)" ;;
 esac
 start=$(date +%s)

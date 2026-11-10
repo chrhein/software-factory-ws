@@ -123,7 +123,7 @@
   .agent-switch button { border: 0; background: transparent; padding: 8px 16px; cursor: pointer; letter-spacing: inherit; text-transform: inherit; font: inherit; }
   .agent-switch button[aria-pressed="true"] { background: var(--ink); color: var(--paper); }
   .agent-switch button:focus-visible { outline: 2px solid var(--accent-line); outline-offset: -2px; }
-  body[data-agent="claude"] [data-only="copilot"], body[data-agent="copilot"] [data-only="claude"] { display: none; }
+  body:not([data-agent="claude"]) [data-only="claude"], body:not([data-agent="copilot"]) [data-only="copilot"], body:not([data-agent="codex"]) [data-only="codex"] { display: none; }
   .cmd[data-only] + .cmd[data-only] { margin-top: 0; }
   .shot { display: block; width: 100%; height: auto; border: 1px solid var(--ink); box-shadow: 8px 8px 0 var(--accent); }
 
@@ -394,7 +394,7 @@
     <div class="slide-inner split">
       <div>
         <h2 class="r" style="--i:1">Hva fabrikken består av</h2>
-        <p class="lead r" style="--i:2">Fabrikken er en mappe med én prompt per steg og noen bash-skript. Skriptene sender promptene i rekkefølge til <code>claude -p</code> eller <code>copilot -p</code> og stopper ved første sperre som sier nei. Verify og CI er tradisjonell kode som ikke stoler på agentene.</p>
+        <p class="lead r" style="--i:2">Fabrikken er en mappe med én prompt per steg og noen bash-skript. Skriptene sender promptene i rekkefølge til <code>claude -p</code>, <code>copilot -p</code> eller <code>codex exec</code> og stopper ved første sperre som sier nei. Verify og CI er tradisjonell kode som ikke stoler på agentene.</p>
       </div>
       <ul class="stack">
         <li class="r" style="--i:3"><span>Kontekst</span><div><code>factory/context.md</code>, som alle stegene leser</div></li>
@@ -432,13 +432,14 @@
     <div class="slide-inner">
       <div class="kicker r" style="--i:0">Oppgave 0 · Verktøy</div>
       <h2 class="r" style="--i:1">Sjekk verktøyene</h2>
-      <div class="agent-switch r" style="--i:2" role="group" aria-label="Hvilket verktøy bruker du?"><button type="button" data-agent="claude">Claude Code</button><button type="button" data-agent="copilot">Copilot</button></div>
+      <div class="agent-switch r" style="--i:2" role="group" aria-label="Hvilket verktøy bruker du?"><button type="button" data-agent="claude">Claude Code</button><button type="button" data-agent="copilot">Copilot</button><button type="button" data-agent="codex">Codex</button></div>
       <div class="steps">
-        <div class="step r" style="--i:2"><div class="step-num">0.1</div><div><p class="step-text">Gjør dette før workshopen. Du trenger Node 24, innlogget <code>gh</code>, Chrome og enten Claude Code eller Copilot CLI, innlogget én gang. Sjekk Node og <code>gh</code> slik:</p>
+        <div class="step r" style="--i:2"><div class="step-num">0.1</div><div><p class="step-text">Gjør dette før workshopen. Du trenger Node 24, innlogget <code>gh</code>, Chrome og enten Claude Code, Copilot CLI eller Codex CLI, innlogget én gang. Sjekk Node og <code>gh</code> slik:</p>
           <div class="cmd"><span class="cmd-where">Terminal</span><pre>node --version &amp;&amp; gh auth status</pre><button class="copy" data-copy>Kopier</button></div></div></div>
         <div class="step r" style="--i:3"><div class="step-num">0.2</div><div><p class="step-text">Sjekk at agenten svarer når den kjører headless</p>
           <div class="cmd" data-only="claude"><span class="cmd-where">Terminal</span><pre>echo "Svar med ett ord: klar" | claude -p</pre><button class="copy" data-copy>Kopier</button></div>
-          <div class="cmd" data-only="copilot"><span class="cmd-where">Terminal</span><pre>copilot -p "Svar med ett ord: klar" -s</pre><button class="copy" data-copy>Kopier</button></div></div></div>
+          <div class="cmd" data-only="copilot"><span class="cmd-where">Terminal</span><pre>copilot -p "Svar med ett ord: klar" -s</pre><button class="copy" data-copy>Kopier</button></div>
+          <div class="cmd" data-only="codex"><span class="cmd-where">Terminal</span><pre>echo "Svar med ett ord: klar" | codex exec -</pre><button class="copy" data-copy>Kopier</button></div></div></div>
       </div>
       <p class="note r" style="--i:4"><strong>Hvorfor:</strong> alle stegene i fabrikken kjører agenten med <code>-p</code> uten at noen sitter og svarer på spørsmål. Svarer agenten her, kan fabrikken bruke den.</p>
     </div>
@@ -518,7 +519,7 @@ EOF</pre><button class="copy" data-copy>Kopier</button></div></div></div>
     <div class="slide-inner">
       <h2 class="r" style="--i:1">Fabrikkens motor</h2>
       <p class="lead r" style="--i:2"><code>factory/stage.sh</code> blir motoren i det hele, et skript vi legger til i neste oppgave. Alle prosesser i fabrikken kjøres gjennom dette.</p>
-      <svg class="flow r" style="--i:3" viewBox="-2 0 1044 436" role="img" aria-label="stage.sh sender stegprompten, tidligere steg i kjøringen og den felles konteksten til agenten, claude -p eller copilot -p. Svaret blir en fil, tiden blir en linje i runs/log.jsonl, og LESSON-linjer legges til i context.md til neste kjøring.">
+      <svg class="flow r" style="--i:3" viewBox="-2 0 1044 436" role="img" aria-label="stage.sh sender stegprompten, tidligere steg i kjøringen og den felles konteksten til agenten, claude -p, copilot -p eller codex exec. Svaret blir en fil, tiden blir en linje i runs/log.jsonl, og LESSON-linjer legges til i context.md til neste kjøring.">
         <path class="f-track" d="M266 60 H330 V340 M266 340 H330 M266 200 H379"/>
         <path class="f-track" d="M645 200 H709 M709 60 V340 M709 60 H758 M709 200 H758 M709 340 H758"/>
         <path class="f-track" d="M899 384 V420 H141 V400"/>
@@ -527,7 +528,7 @@ EOF</pre><button class="copy" data-copy>Kopier</button></div></div></div>
         <g class="f-code"><rect x="16" y="16" width="250" height="88"/><text x="141" y="54">Stegprompt</text><text class="f-sub" x="141" y="81">factory/&lt;steg&gt;.md</text></g>
         <g class="f-code"><rect x="16" y="156" width="250" height="88"/><text x="141" y="194">Tidligere steg</text><text class="f-sub" x="141" y="221">runs/&lt;sak&gt;/*.md</text></g>
         <g class="f-code"><rect x="16" y="296" width="250" height="88"/><text x="141" y="334">Felles kontekst</text><text class="f-sub" x="141" y="361">factory/context.md</text></g>
-        <g class="f-agent"><rect x="395" y="156" width="250" height="88" rx="44"/><text x="520" y="194">Agenten</text><text class="f-sub" x="520" y="221">claude -p eller copilot -p</text></g>
+        <g class="f-agent"><rect x="395" y="156" width="250" height="88" rx="44"/><text x="520" y="194">Agenten</text><text class="f-sub" x="520" y="221">claude, copilot eller codex</text></g>
         <g class="f-code"><rect x="774" y="16" width="250" height="88"/><text x="899" y="54">Svar</text><text class="f-sub" x="899" y="81">runs/&lt;sak&gt;/&lt;steg&gt;.md</text></g>
         <g class="f-code"><rect x="774" y="156" width="250" height="88"/><text x="899" y="194">Logglinje</text><text class="f-sub" x="899" y="221">runs/log.jsonl</text></g>
         <g class="f-code"><rect x="774" y="296" width="250" height="88"/><text x="899" y="334">Lærdommer</text><text class="f-sub" x="899" y="361">LESSON: → context.md</text></g>
@@ -540,10 +541,11 @@ EOF</pre><button class="copy" data-copy>Kopier</button></div></div></div>
     <div class="slide-inner">
       <div class="kicker r" style="--i:0">Oppgave 1 · Motor</div>
       <h2 class="r" style="--i:1">Lag skriptet som kjører et steg</h2>
-      <div class="agent-switch r" style="--i:2" role="group" aria-label="Hvilket verktøy bruker du?"><button type="button" data-agent="claude">Claude Code</button><button type="button" data-agent="copilot">Copilot</button></div>
+      <div class="agent-switch r" style="--i:2" role="group" aria-label="Hvilket verktøy bruker du?"><button type="button" data-agent="claude">Claude Code</button><button type="button" data-agent="copilot">Copilot</button><button type="button" data-agent="codex">Codex</button></div>
       <div class="steps">
         <div class="step r" style="--i:3"><div class="step-num">1.2</div><div><p class="step-text" data-only="claude">Skriptet sender stegprompten, konteksten og alt tidligere i kjøringen til <code>claude -p</code>. Svaret blir en fil, og en linje havner i loggen. Hvert steg får sin egen verktøyliste i <code>case</code>-blokken.</p>
           <p class="step-text" data-only="copilot">Skriptet sender stegprompten, konteksten og alt tidligere i kjøringen til <code>copilot -p</code>. Svaret blir en fil, og en linje havner i loggen. Hvert steg får sin egen verktøyliste i <code>case</code>-blokken.</p>
+          <p class="step-text" data-only="codex">Skriptet sender stegprompten, konteksten og alt tidligere i kjøringen til <code>codex exec</code>. Svaret blir en fil, og en linje havner i loggen. Hvert steg får sin egen sandkasse i <code>case</code>-blokken, og filene steget ikke får endre, står i <code>keep</code>.</p>
           <div class="cmd file" data-only="claude"><span class="cmd-where">Terminal</span><pre>cat &gt; factory/stage.sh &lt;&lt;'EOF' &amp;&amp; chmod +x factory/stage.sh
 #!/usr/bin/env bash
 # Ett steg: prompt + felles kontekst + alt tidligere i kjøringen → claude -p → en fil og en linje i loggen.
@@ -585,9 +587,35 @@ copilot -p "$prompt" -s --no-ask-user --allow-tool="$tools" ${deny:+--deny-tool=
 echo "{\"run\":\"$run\",\"stage\":\"$stage\",\"sec\":$(( $(date +%s) - start ))}" &gt;&gt; runs/log.jsonl
 grep '^LESSON:' "$run/$stage.md" | sed 's/^LESSON: */- /' &gt;&gt; factory/context.md || true
 cat "$run/$stage.md"
+EOF</pre><button class="copy" data-copy>Kopier</button></div>
+          <div class="cmd file" data-only="codex"><span class="cmd-where">Terminal</span><pre>cat &gt; factory/stage.sh &lt;&lt;'EOF' &amp;&amp; chmod +x factory/stage.sh
+#!/usr/bin/env bash
+# Ett steg med Codex CLI: prompt + felles kontekst + alt tidligere i kjøringen → codex exec → en fil og en linje i loggen.
+# Bruk: factory/stage.sh &lt;steg&gt; &lt;kjøremappe&gt;
+set -euo pipefail
+{ # Bash leser hele blokken før den kjører, så en endret stage.sh slår ikke inn midt i kjøringen.
+stage=$1; run=$2; conf=""; keep=""
+case $stage in
+  2-test)    sandbox=workspace-write; keep=$(find src -type f ! -name '*.test.ts') ;;
+  3-build)   sandbox=workspace-write; keep=$(find src -name '*.test.ts') ;;
+  5-check)   sandbox=read-only; conf='mcp_servers.playwright={command="npx",args=["-y","@playwright/mcp@0.0.83","--isolated"]}' ;;
+  6-monitor) sandbox=workspace-write; conf='sandbox_workspace_write.network_access=true'; keep=$(find src backlog -type f) ;;
+  *)         sandbox=read-only ;;
+esac
+# Codex har ingen verktøyliste per fil. Låste filer tas vare på før steget og settes tilbake hvis agenten endret dem.
+keep="$keep factory/*.sh factory/7-judge.md factory/8-learn.md"
+snap=$(mktemp); tar cf "$snap" $keep 2&gt;/dev/null || true; before=$(shasum $keep 2&gt;/dev/null || true)
+start=$(date +%s)
+{ cat "factory/$stage.md" factory/context.md; echo "&lt;input&gt;"; cat "$run"/*.md 2&gt;/dev/null || true; echo "&lt;/input&gt;"; } \
+  | codex exec --sandbox "$sandbox" ${conf:+-c "$conf"} -o "$run/$stage.md" - &gt; /dev/null
+[ "$(shasum $keep 2&gt;/dev/null || true)" = "$before" ] || { tar xf "$snap"; echo "$stage endret låste filer. stage.sh satte dem tilbake." &gt;&amp;2; }
+echo "{\"run\":\"$run\",\"stage\":\"$stage\",\"sec\":$(( $(date +%s) - start ))}" &gt;&gt; runs/log.jsonl
+grep '^LESSON:' "$run/$stage.md" | sed 's/^LESSON: */- /' &gt;&gt; factory/context.md || true
+cat "$run/$stage.md"
+exit; }
 EOF</pre><button class="copy" data-copy>Kopier</button></div></div></div>
       </div>
-      <p class="note r" style="--i:4"><strong>Hvorfor:</strong> en agent du starter for hånd, kan bruke alle verktøyene du noen gang har gitt den lov til. <span data-only="claude">Med <code>--permission-mode dontAsk</code> avviser Claude Code alt som ikke står i verktøylista til steget.</span><span data-only="copilot">Med <code>-p</code> avviser Copilot alt som ikke står i <code>--allow-tool</code>, og <code>--deny-tool</code> hindrer build i å endre testene.</span> Da hjelper det ikke å lure agenten med tekst i en sak.</p>
+      <p class="note r" style="--i:4"><strong>Hvorfor:</strong> en agent du starter for hånd, kan bruke alle verktøyene du noen gang har gitt den lov til. <span data-only="claude">Med <code>--permission-mode dontAsk</code> avviser Claude Code alt som ikke står i verktøylista til steget.</span><span data-only="copilot">Med <code>-p</code> avviser Copilot alt som ikke står i <code>--allow-tool</code>, og <code>--deny-tool</code> hindrer build i å endre testene.</span><span data-only="codex">Codex har ingen verktøyliste per fil. Stegene som bare skal lese, kjører med <code>--sandbox read-only</code>. Endrer et steg en fil i <code>keep</code>, setter <code>stage.sh</code> den tilbake.</span> Da hjelper det ikke å lure agenten med tekst i en sak.</p>
     </div>
   </section>
 
@@ -698,7 +726,7 @@ EOF</pre><button class="copy" data-copy>Kopier</button></div></div></div>
         <div class="step r" style="--i:3"><div class="step-num">4.2</div><div><p class="step-text">Kjør den på <code>t1</code>. Den ser saken, notatene fra triage og testen. Les så diffen.</p>
           <div class="cmd"><span class="cmd-where">Terminal</span><pre>factory/stage.sh 3-build runs/t1 &amp;&amp; git diff --stat</pre><button class="copy" data-copy>Kopier</button></div></div></div>
       </div>
-      <p class="note r" style="--i:4"><strong>Hvorfor:</strong> build kan lese testen, men den kan ikke endre den. Prøver den, blir endringen avvist av Claude Code eller Copilot. Konteksten følger med i filer i stedet for i en lang chat, så build starter der triage og test-steget slapp.</p>
+      <p class="note r" style="--i:4"><strong>Hvorfor:</strong> build kan lese testen, men den kan ikke endre den. Prøver den, blir endringen avvist av Claude Code eller Copilot, eller satt tilbake av <code>stage.sh</code> med Codex. Konteksten følger med i filer i stedet for i en lang chat, så build starter der triage og test-steget slapp.</p>
     </div>
   </section>
 
@@ -800,10 +828,11 @@ EOF</pre><button class="copy" data-copy>Kopier</button></div></div></div>
     <div class="slide-inner">
       <div class="kicker r" style="--i:0">Oppgave 7 · Sjekk i nettleseren</div>
       <h2 class="r" style="--i:1">Gi agenten en nettleser</h2>
-      <div class="agent-switch r" style="--i:2" role="group" aria-label="Hvilket verktøy bruker du?"><button type="button" data-agent="claude">Claude Code</button><button type="button" data-agent="copilot">Copilot</button></div>
+      <div class="agent-switch r" style="--i:2" role="group" aria-label="Hvilket verktøy bruker du?"><button type="button" data-agent="claude">Claude Code</button><button type="button" data-agent="copilot">Copilot</button><button type="button" data-agent="codex">Codex</button></div>
       <div class="steps">
         <div class="step r" style="--i:3"><div class="step-num">7.1</div><div><p class="step-text" data-only="claude">Playwright MCP lar agenten åpne sider, klikke og skrive. <small>(Første kjøring laster ned pakken.)</small></p>
           <p class="step-text" data-only="copilot">Copilot-versjonen av <code>stage.sh</code> starter Playwright MCP selv, så du trenger ingen egen fil. Playwright MCP lar agenten åpne sider, klikke og skrive.</p>
+          <p class="step-text" data-only="codex">Codex-versjonen av <code>stage.sh</code> starter Playwright MCP selv, så du trenger ingen egen fil. Playwright MCP lar agenten åpne sider, klikke og skrive.</p>
           <div class="cmd file" data-only="claude"><span class="cmd-where">Terminal</span><pre>cat &gt; factory/mcp.json &lt;&lt;'EOF'
 {
   "mcpServers": {
@@ -1236,7 +1265,7 @@ EOF</pre><button class="copy" data-copy>Kopier</button></div></div></div>
     <div class="slide-inner">
       <div class="kicker r" style="--i:0">Oppgave 15 · Fabrikken lærer</div>
       <h2 class="r" style="--i:1">Fabrikken skriver om promptene</h2>
-      <div class="agent-switch r" style="--i:2" role="group" aria-label="Hvilket verktøy bruker du?"><button type="button" data-agent="claude">Claude Code</button><button type="button" data-agent="copilot">Copilot</button></div>
+      <div class="agent-switch r" style="--i:2" role="group" aria-label="Hvilket verktøy bruker du?"><button type="button" data-agent="claude">Claude Code</button><button type="button" data-agent="copilot">Copilot</button><button type="button" data-agent="codex">Codex</button></div>
       <div class="steps">
         <div class="step r" style="--i:3"><div class="step-num">15.1</div><div><p class="step-text">Legg til læresteget i <code>stage.sh</code>. Det får endre promptene og <code>context.md</code>, men ikke dommeren.</p>
           <div class="cmd file" data-only="claude"><span class="cmd-where">Terminal</span><pre>line=$(cat &lt;&lt;'EOF'
@@ -1246,6 +1275,11 @@ EOF
 LINE=$line perl -pi -e 'print "$ENV{LINE}\n" if /^  \*\)/' factory/stage.sh &amp;&amp; grep 8-learn factory/stage.sh</pre><button class="copy" data-copy>Kopier</button></div>
           <div class="cmd file" data-only="copilot"><span class="cmd-where">Terminal</span><pre>line=$(cat &lt;&lt;'EOF'
   8-learn)   tools="read,$(cd factory &amp;&amp; ls [1-6]-*.md context.md | sed 's/.*/write(&amp;)/' | paste -sd, -)" ;;
+EOF
+)
+LINE=$line perl -pi -e 'print "$ENV{LINE}\n" if /^  \*\)/' factory/stage.sh &amp;&amp; grep 8-learn factory/stage.sh</pre><button class="copy" data-copy>Kopier</button></div>
+          <div class="cmd file" data-only="codex"><span class="cmd-where">Terminal</span><pre>line=$(cat &lt;&lt;'EOF'
+  8-learn)   sandbox=workspace-write; keep=$(find src -type f) ;;
 EOF
 )
 LINE=$line perl -pi -e 'print "$ENV{LINE}\n" if /^  \*\)/' factory/stage.sh &amp;&amp; grep 8-learn factory/stage.sh</pre><button class="copy" data-copy>Kopier</button></div></div></div>
@@ -1444,7 +1478,7 @@ EOF</pre><button class="copy" data-copy>Kopier</button></div></div></div>
     });
   });
 
-  // Claude Code eller Copilot: valget gjelder alle lysbilder med bryter, og huskes til neste gang.
+  // Claude Code, Copilot eller Codex: valget gjelder alle lysbilder med bryter, og huskes til neste gang.
   const setAgent = agent => {
     document.body.dataset.agent = agent;
     document.querySelectorAll('.agent-switch button').forEach(b => b.setAttribute('aria-pressed', String(b.dataset.agent === agent)));
@@ -1452,7 +1486,7 @@ EOF</pre><button class="copy" data-copy>Kopier</button></div></div></div>
   };
   let savedAgent = null;
   try { savedAgent = localStorage.getItem('agent'); } catch {}
-  setAgent(savedAgent === 'copilot' ? 'copilot' : 'claude');
+  setAgent(['copilot', 'codex'].includes(savedAgent) ? savedAgent : 'claude');
   document.querySelectorAll('.agent-switch button').forEach(b => b.addEventListener('click', () => setAgent(b.dataset.agent)));
 
   const fromHash = parseInt(location.hash.slice(1), 10);

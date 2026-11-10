@@ -3,7 +3,7 @@
 ## Før workshopen
 
 1. Del lenken til lysbildene: https://chrhein.github.io/software-factory-ws/workshop.html. Malen `chrhein/software-factory-ws` er offentlig, og GitHub Pages publiserer `main`, så lysbildene oppdateres når du pusher.
-2. Be deltakerne gjøre oppgave 0 før de kommer (Node 24, `gh auth login`, Chrome og innlogget `claude` eller `copilot`), og kjøre `npx -y @playwright/mcp@0.0.83 --help` én gang, så pakken er lastet ned før oppgave 7.
+2. Be deltakerne gjøre oppgave 0 før de kommer (Node 24, `gh auth login`, Chrome og innlogget `claude`, `copilot` eller `codex`), og kjøre `npx -y @playwright/mcp@0.0.83 --help` én gang, så pakken er lastet ned før oppgave 7.
 3. Gjør en testkjøring i et nytt repo laget fra malen. Den tar et kvarter:
    ```bash
    gh repo create woltora-test --private --clone --template chrhein/software-factory-ws && cd woltora-test && npm ci && mkdir -p runs
@@ -14,7 +14,7 @@
    gh issue create --label factory --title "For mange av samme rett" --body-file backlog/09-maks-antall.md
    ```
    Sak 09 skal stoppe med et utkast til en spec i issuen. Lim utkastet inn i beskrivelsen og sett på labelen igjen. Da skal triage si `automatable`. Stopp så `watch.sh`, og kjør `factory/learn.sh && git diff factory` for å se at læresteget finner issuen.
-   Kjør den én gang til med `cp ../software-factory-ws/solution/copilot/stage.sh factory/` for å teste Copilot-varianten.
+   Kjør den én gang til med `cp ../software-factory-ws/solution/copilot/stage.sh factory/` for å teste Copilot-varianten, og med `solution/codex/stage.sh` for Codex.
 
    Sjekk særlig at knappen «Meld fra om en feil» setter labelen `factory`. Det er ikke testet mot ekte GitHub ennå. Kjør også steg 0.7 én gang, og se at deployen til Pages går gjennom når variabelen `PAGES` er satt.
 
@@ -28,6 +28,16 @@
 - At `copilot -p` kjører i et repo som ikke er godkjent interaktivt først. Hvis ikke, må deltakerne kjøre `copilot` én gang i repoet.
 - At `write(1-triage.md)` og `write(context.md)` i `8-learn` slipper gjennom endringer i `factory/1-triage.md` og `factory/context.md`. Hvis ikke, ender læresteget alltid med `LEARN: nothing`.
 - Deny-lista i `.claude/settings.json` gjelder bare Claude Code. Copilot-agentene kan lese `workshop.html` og `solution/`.
+
+## Codex CLI er bare testet med en stub
+
+`solution/codex/stage.sh` følger OpenAI-dokumentasjonen for `codex exec`, men er ikke kjørt mot ekte Codex. Codex har ingen verktøyliste per fil. Skriptet bruker `--sandbox read-only` for stegene som bare leser, og setter tilbake filene i `keep` hvis et steg endret dem. Sjekk dette i testkjøringen:
+
+- At `-c 'mcp_servers.playwright={…}'` godtar en inline-tabell, og at Playwright MCP får skrive `.playwright-mcp/` når sandkassen er `read-only`.
+- At `gh issue list` virker i `6-monitor` med `sandbox_workspace_write.network_access=true`. På macOS kan sandkassen stenge for tokenet til `gh` i nøkkelringen.
+- At `npm test` og `git diff` kjører i `read-only`-sandkassen.
+- At build ikke stopper på regelen i `AGENTS.md` om å skrive en test først. Codex får skrive testen, og `stage.sh` setter den tilbake etterpå.
+- Deny-lista i `.claude/settings.json` gjelder ikke Codex heller.
 
 ## Slik gikk en testkjøring (5. november 2026, Opus)
 

@@ -31,7 +31,7 @@ Lysbildene ligger på [chrhein.github.io/software-factory-ws/workshop.html](http
 | Sti | Innhold |
 |---|---|
 | `workshop.html` | Lysbildene, med alle filene som heredocs du kan kopiere |
-| `bilder/` | Skjermbildene av Woltora og build.warp.dev som lysbildene bruker |
+| `bilder/` | Skjermbildene av Woltora og build.warp.dev som lysbildene bruker, og ikonet til lysbildene |
 | `backlog/` | Feilrapporter fra brukere |
 | `.github/workflows/ci.yml` | Tester hver pull request og hver push til `main`. Deployer `main` til GitHub Pages hvis du har skrudd det på (frivillig, oppgave 0.7) |
 | `.claude/settings.json` | Skjuler lysbildene, fasiten og fasilitatorguiden for Claude Code, så agentene ikke ser svarene |

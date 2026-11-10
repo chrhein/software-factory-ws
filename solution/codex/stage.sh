@@ -9,6 +9,7 @@ case $stage in
   3-build)   sandbox=workspace-write; keep=$(find src -name '*.test.ts') ;;
   5-check)   sandbox=read-only; conf='mcp_servers.playwright={command="npx",args=["-y","@playwright/mcp@0.0.83","--isolated"]}' ;;
   6-monitor) sandbox=workspace-write; conf='sandbox_workspace_write.network_access=true'; keep=$(find src backlog -type f) ;;
+  8-learn)   sandbox=workspace-write; keep=$(find src -type f) ;;
   *)         sandbox=read-only ;;
 esac
 # Codex har ingen verktøyliste per fil. Låste filer tas vare på før steget og settes tilbake hvis agenten endret dem.

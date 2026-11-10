@@ -1268,21 +1268,15 @@ EOF</pre><button class="copy" data-copy>Kopier</button></div></div></div>
       <div class="agent-switch r" style="--i:2" role="group" aria-label="Hvilket verktøy bruker du?"><button type="button" data-agent="claude">Claude Code</button><button type="button" data-agent="copilot">Copilot</button><button type="button" data-agent="codex">Codex</button></div>
       <div class="steps">
         <div class="step r" style="--i:3"><div class="step-num">15.1</div><div><p class="step-text">Legg til læresteget i <code>stage.sh</code>. Det får endre promptene og <code>context.md</code>, men ikke dommeren.</p>
-          <div class="cmd file" data-only="claude"><span class="cmd-where">Terminal</span><pre>line=$(cat &lt;&lt;'EOF'
+          <div class="cmd file" data-only="claude"><span class="cmd-where">Terminal</span><pre>perl -pi -e 'BEGIN { chomp($l = &lt;STDIN&gt;) } print "$l\n" if /^  \*\)/' factory/stage.sh &lt;&lt;'EOF' &amp;&amp; grep 8-learn factory/stage.sh
   8-learn)   tools="Read,Glob,Grep,Edit(factory/*.md)"; deny="Edit(factory/7-judge.md),Edit(factory/8-learn.md)" ;;
-EOF
-)
-LINE=$line perl -pi -e 'print "$ENV{LINE}\n" if /^  \*\)/' factory/stage.sh &amp;&amp; grep 8-learn factory/stage.sh</pre><button class="copy" data-copy>Kopier</button></div>
-          <div class="cmd file" data-only="copilot"><span class="cmd-where">Terminal</span><pre>line=$(cat &lt;&lt;'EOF'
+EOF</pre><button class="copy" data-copy>Kopier</button></div>
+          <div class="cmd file" data-only="copilot"><span class="cmd-where">Terminal</span><pre>perl -pi -e 'BEGIN { chomp($l = &lt;STDIN&gt;) } print "$l\n" if /^  \*\)/' factory/stage.sh &lt;&lt;'EOF' &amp;&amp; grep 8-learn factory/stage.sh
   8-learn)   tools="read,$(cd factory &amp;&amp; ls [1-6]-*.md context.md | sed 's/.*/write(&amp;)/' | paste -sd, -)" ;;
-EOF
-)
-LINE=$line perl -pi -e 'print "$ENV{LINE}\n" if /^  \*\)/' factory/stage.sh &amp;&amp; grep 8-learn factory/stage.sh</pre><button class="copy" data-copy>Kopier</button></div>
-          <div class="cmd file" data-only="codex"><span class="cmd-where">Terminal</span><pre>line=$(cat &lt;&lt;'EOF'
+EOF</pre><button class="copy" data-copy>Kopier</button></div>
+          <div class="cmd file" data-only="codex"><span class="cmd-where">Terminal</span><pre>perl -pi -e 'BEGIN { chomp($l = &lt;STDIN&gt;) } print "$l\n" if /^  \*\)/' factory/stage.sh &lt;&lt;'EOF' &amp;&amp; grep 8-learn factory/stage.sh
   8-learn)   sandbox=workspace-write; keep=$(find src -type f) ;;
-EOF
-)
-LINE=$line perl -pi -e 'print "$ENV{LINE}\n" if /^  \*\)/' factory/stage.sh &amp;&amp; grep 8-learn factory/stage.sh</pre><button class="copy" data-copy>Kopier</button></div></div></div>
+EOF</pre><button class="copy" data-copy>Kopier</button></div></div></div>
         <div class="step r" style="--i:4"><div class="step-num">15.2</div><div><p class="step-text">Læresteget lærer av to ting: det dommeren trekker for, og det du rettet i spec-utkastet i 12.3</p>
           <div class="cmd file md"><span class="cmd-where">Terminal</span><pre>cat &gt; factory/8-learn.md &lt;&lt;'EOF'
 Du er læresteget i en programvarefabrikk. De andre stegene jobber med én sak om gangen. Du ser på mange kjøringer samlet og forbedrer promptene og konteksten de jobber etter.

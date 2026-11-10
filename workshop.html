@@ -214,6 +214,7 @@
   .flow .f-sub { font: 400 15px var(--display); letter-spacing: 0; }
   .f-track { fill: none; stroke: var(--ink); stroke-width: 3; }
   .f-head { fill: var(--ink); }
+  .f-dash { fill: none; stroke: var(--ink); stroke-width: 3; stroke-dasharray: 8 6; }
   .f-side { font: 500 14px var(--action) !important; letter-spacing: .06em !important; text-transform: uppercase; text-anchor: start !important; fill: var(--ink); }
   .f-agent rect { fill: var(--ink); }
   .f-agent text { fill: var(--paper); }
@@ -310,38 +311,45 @@
   <section class="slide" data-part="Del 1 · Fabrikken">
     <div class="slide-inner">
       <h2 class="r" style="--i:1">Hva er en programvarefabrikk?</h2>
-      <svg class="flow r" style="--i:2" viewBox="0 66 1040 434" role="img" aria-label="Fabrikkloopen: En issue starter triage. Så skriver et steg en test som feiler, build fikser feilen, review leser diffen og verify kjører testene. CI tester og merger til main, en agent sjekker appen på main, og overvåkingen melder neste sak. Alle stegene deler kontekst, og alle kjøringer blir logget. Ingen mennesker leser koden.">
+      <svg class="flow r" style="--i:2" viewBox="0 66 1040 434" role="img" aria-label="Fabrikkloopen: En issue starter triage. Er saken uklar, skriver spec-steget et utkast, og et menneske godkjenner det før saken sendes inn igjen. Ellers skriver et steg en test som feiler, build fikser feilen, review leser diffen og verify kjører testene. CI tester og merger til main, en agent sjekker appen på main, og overvåkingen melder neste sak. Alle stegene deler kontekst, og alle kjøringer blir logget. Ingen mennesker leser koden.">
         <rect class="f-track" x="104" y="120" width="832" height="330" rx="36"/>
         <g class="f-head">
           <polygon points="201,111 217,120 201,129"/><polygon points="409,111 425,120 409,129"/><polygon points="617,111 633,120 617,129"/><polygon points="825,111 841,120 825,129"/>
           <polygon points="927,277 936,293 945,277"/>
           <polygon points="830,441 814,450 830,459"/><polygon points="604,441 588,450 604,459"/><polygon points="378,441 362,450 378,459"/>
-          <polygon points="95,293 104,277 113,293"/>
+          <polygon points="95,212 104,196 113,212"/><polygon points="95,368 104,352 113,368"/>
+          <polygon points="335,220 344,236 353,220"/><polygon points="122,271 106,280 122,289"/>
         </g>
-        <text class="f-side" x="120" y="291">neste sak</text>
+        <text class="f-side" x="120" y="366">neste sak</text>
+        <path class="f-dash" d="M344 164 V220 M256 280 H122"/>
+        <text class="f-label" x="356" y="206" style="text-anchor:start">uklar sak</text>
+        <text class="f-label" x="182" y="250">et menneske</text>
+        <text class="f-label" x="182" y="268">godkjenner</text>
 
-        <g class="f-human"><rect x="16" y="76" width="176" height="88"/><text x="104" y="114">Trigger</text><text class="f-sub" x="104" y="141">issue · loggene · Slack</text></g>
-        <g class="f-agent"><rect x="224" y="76" width="176" height="88" rx="44"/><text x="312" y="114">Triage</text><text class="f-sub" x="312" y="141">reproduserer, avgjør</text></g>
-        <g class="f-agent"><rect x="432" y="76" width="176" height="88" rx="44"/><text x="520" y="114">Test</text><text class="f-sub" x="520" y="141">beviser feilen</text></g>
+        <g class="f-human"><rect x="16" y="76" width="176" height="88"/><text x="104" y="114">Trigger</text><text class="f-sub" x="104" y="141">issue med label factory</text></g>
+        <g class="f-agent"><rect x="224" y="76" width="176" height="88" rx="44"/><text x="312" y="114">Triage</text><text class="f-sub" x="312" y="141">finner årsaken, avgjør</text></g>
+        <g class="f-agent"><rect x="432" y="76" width="176" height="88" rx="44"/><text x="520" y="114">Test</text><text class="f-sub" x="520" y="141">reproduserer feilen</text></g>
         <g class="f-agent"><rect x="640" y="76" width="176" height="88" rx="44"/><text x="728" y="114">Build</text><text class="f-sub" x="728" y="141">skriver koden</text></g>
         <g class="f-agent"><rect x="848" y="76" width="176" height="88" rx="44"/><text x="936" y="114">Review</text><text class="f-sub" x="936" y="141">leser diffen</text></g>
 
-        <g class="f-code"><rect x="848" y="406" width="176" height="88"/><text x="936" y="444">Verify</text><text class="f-sub" x="936" y="471">kjører testene</text></g>
+        <g class="f-agent"><rect x="256" y="236" width="176" height="88" rx="44"/><text x="344" y="274">Spec</text><text class="f-sub" x="344" y="301">skriver et utkast</text></g>
+
+        <g class="f-code"><rect x="848" y="406" width="176" height="88"/><text x="936" y="444">Verify</text><text class="f-sub" x="936" y="471">rødt før, grønt etter</text></g>
         <g class="f-code"><rect x="622" y="406" width="176" height="88"/><text x="710" y="444">CI og merge</text><text class="f-sub" x="710" y="471">inn på main</text></g>
         <g class="f-agent"><rect x="396" y="406" width="176" height="88" rx="44"/><text x="484" y="444">Sjekk av main</text><text class="f-sub" x="484" y="471">klikker i appen</text></g>
         <g class="f-agent"><rect x="170" y="406" width="176" height="88" rx="44"/><text x="258" y="444">Overvåking</text><text class="f-sub" x="258" y="471">melder neste sak</text></g>
 
-        <rect class="f-hub" x="300" y="200" width="440" height="168" rx="12"/>
-        <text class="f-hub-label" x="520" y="238">Under alle stegene</text>
-        <text class="f-hub-text" x="520" y="290">① Samme kontekst</text>
-        <text class="f-hub-text" x="520" y="336">② Alle kjøringer logget</text>
+        <rect class="f-hub" x="500" y="200" width="380" height="168" rx="12"/>
+        <text class="f-hub-label" x="690" y="238">Under alle stegene</text>
+        <text class="f-hub-text" x="690" y="290">① Samme kontekst</text>
+        <text class="f-hub-text" x="690" y="336">② Alle kjøringer logget</text>
       </svg>
       <div class="flow-legend r" style="--i:3">
         <span><i class="swatch swatch--agent"></i>Agent</span>
         <span><i class="swatch"></i>Vanlig kode</span>
         <span><i class="swatch swatch--human"></i>Et menneske eller omverdenen</span>
       </div>
-      <p class="hint-line r" style="--i:4">Ingen av boksene er et menneske som leser koden. Stopper et steg saken, får et menneske den som en kommentar i issuen.</p>
+      <p class="hint-line r" style="--i:4">Ingen mennesker leser koden. Er saken uklar, godkjenner et menneske specen før fabrikken fortsetter. Stopper et steg saken, får et menneske den som en kommentar i issuen.</p>
     </div>
   </section>
 

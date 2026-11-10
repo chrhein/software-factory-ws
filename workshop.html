@@ -156,7 +156,7 @@
   th, td { text-align: left; padding: 14px 12px 14px 0; border-bottom: 1px solid var(--line); vertical-align: top; }
   th { font: 500 10px var(--action); letter-spacing: .1em; text-transform: uppercase; color: var(--muted); border-bottom-color: var(--ink); }
   td:first-child { font-weight: 500; }
-  tr.today td { background: var(--color-accent-background-tinted); }
+  tr.today td { background: var(--accent); }
   tr.later td { opacity: .45; }
   td code { white-space: nowrap; }
   .stack code { white-space: nowrap; }
@@ -164,6 +164,7 @@
   table.tight th, table.tight td { padding-top: 7px; padding-bottom: 7px; }
   table.tight td:first-child { font: 12px var(--mono); color: var(--muted); width: 48px; }
   table.levels td:last-child { position: relative; }
+  table.levels th:first-child, table.levels td:first-child { text-align: center; }
   .level-img { position: absolute; right: 0; top: calc(100% + 8px); z-index: 2; width: min(400px, 60vw); height: auto; border-radius: 8px; box-shadow: 0 12px 32px rgb(0 0 0 / .25); opacity: 0; transform: translateY(4px); transition: opacity .2s, transform .2s; pointer-events: none; }
   table.levels tr:nth-child(n+4) .level-img { top: auto; bottom: calc(100% + 8px); transform: translateY(-4px); }
   table.levels tr:hover .level-img { opacity: 1; transform: none; }
@@ -311,7 +312,7 @@
   <section class="slide" data-part="Del 1 · Fabrikken">
     <div class="slide-inner">
       <h2 class="r" style="--i:1">Hva er en programvarefabrikk?</h2>
-      <svg class="flow r" style="--i:2" viewBox="0 66 1040 434" role="img" aria-label="Fabrikkloopen: En issue starter triage. Er saken uklar, skriver spec-steget et utkast, og et menneske godkjenner det før saken sendes inn igjen. Ellers skriver et steg en test som feiler, build fikser feilen, review leser diffen og verify kjører testene. CI tester og merger til main, en agent sjekker appen på main, og overvåkingen melder neste sak. Alle stegene deler kontekst, og alle kjøringer blir logget. Ingen mennesker leser koden.">
+      <svg class="flow r" style="--i:2" viewBox="0 66 1040 434" role="img" aria-label="Fabrikkloopen: En issue starter triage. Er saken uklar, skriver spec-steget et utkast, og et menneske godkjenner det før saken sendes inn igjen. Ellers skriver et steg en test som feiler, build fikser feilen, review leser diffen og verify kjører testene. CI tester og merger til main, en agent sjekker appen på main, og overvåkingen melder neste sak. Alle stegene deler kontekst, og lærdommen fra hver kjøring havner i den felles konteksten. Ingen mennesker leser koden.">
         <rect class="f-track" x="104" y="120" width="832" height="330" rx="36"/>
         <g class="f-head">
           <polygon points="201,111 217,120 201,129"/><polygon points="409,111 425,120 409,129"/><polygon points="617,111 633,120 617,129"/><polygon points="825,111 841,120 825,129"/>
@@ -322,7 +323,7 @@
         </g>
         <text class="f-side" x="120" y="366">neste sak</text>
         <path class="f-dash" d="M344 164 V220 M256 280 H122"/>
-        <text class="f-label" x="356" y="206" style="text-anchor:start">uklar sak</text>
+        <text class="f-label" x="332" y="206" style="text-anchor:end">uklar sak</text>
         <text class="f-label" x="182" y="250">et menneske</text>
         <text class="f-label" x="182" y="268">godkjenner</text>
 
@@ -339,14 +340,16 @@
         <g class="f-agent"><rect x="396" y="406" width="176" height="88" rx="44"/><text x="484" y="444">Sjekk av main</text><text class="f-sub" x="484" y="471">klikker i appen</text></g>
         <g class="f-agent"><rect x="170" y="406" width="176" height="88" rx="44"/><text x="258" y="444">Overvåking</text><text class="f-sub" x="258" y="471">melder neste sak</text></g>
 
-        <rect class="f-hub" x="500" y="200" width="380" height="168" rx="12"/>
-        <text class="f-hub-label" x="690" y="238">Under alle stegene</text>
-        <text class="f-hub-text" x="690" y="290">① Samme kontekst</text>
-        <text class="f-hub-text" x="690" y="336">② Alle kjøringer logget</text>
+        <rect class="f-hub" x="470" y="200" width="436" height="168" rx="12"/>
+        <text class="f-hub-label" x="496" y="238" style="text-anchor:start">Under alle stegene</text>
+        <text class="f-hub-text" x="496" y="290" style="text-anchor:start">① Samme kontekst</text>
+        <text class="f-hub-text" x="496" y="336" style="text-anchor:start">② Hver kjøring gir lærdom</text>
+        <path class="f-dash" d="M832 326 H858 V280 H755"/>
+        <polygon class="f-head" points="755,271 739,280 755,289"/>
       </svg>
       <div class="flow-legend r" style="--i:3">
         <span><i class="swatch swatch--agent"></i>Agent</span>
-        <span><i class="swatch"></i>Vanlig kode</span>
+        <span><i class="swatch"></i>Tradisjonell kode</span>
         <span><i class="swatch swatch--human"></i>Et menneske eller omverdenen</span>
       </div>
       <p class="hint-line r" style="--i:4">Ingen mennesker leser koden. Er saken uklar, godkjenner et menneske specen før fabrikken fortsetter. Stopper et steg saken, får et menneske den som en kommentar i issuen.</p>
@@ -376,7 +379,7 @@
       <div class="kicker r" style="--i:0">Et eksempel i drift</div>
       <h2 class="r" style="--i:1">Slik jobber Warp</h2>
       <p class="lead r" style="--i:2;max-width:none">Warp viser fabrikken sin offentlig. Hver issue går gjennom triage, spec, implementering og review, og under triage ser du om saken venter på agenten eller på et menneske.</p>
-      <a class="r" style="--i:3;display:block;margin-top:24px" href="https://build.warp.dev/" target="_blank"><img class="shot" style="width:auto;max-width:100%;max-height:40vh" src="bilder/warp-build.png" alt="Skjermbilde av build.warp.dev. Triaging har statusene Agent working, Awaiting agent, Needs mocks, Needs info og Awaiting maintainer, og under ligger Ready to spec og Creating spec. Til høyre står issues som venter på agenten." /></a>
+      <a class="r" style="--i:3;display:block;width:fit-content;margin:24px auto 0" href="https://build.warp.dev/" target="_blank"><img class="shot" style="width:auto;max-width:100%;max-height:40vh;margin:0 auto" src="bilder/warp-build.png" alt="Skjermbilde av build.warp.dev. Triaging har statusene Agent working, Awaiting agent, Needs mocks, Needs info og Awaiting maintainer, og under ligger Ready to spec og Creating spec. Til høyre står issues som venter på agenten." /></a>
       <p class="hint-line r" style="--i:4">10. november ventet 1 897 saker på en maintainer og 140 på agenten, så den største køen er mennesker. Kilde: <a href="https://build.warp.dev/" target="_blank">build.warp.dev</a>. Klikk på bildet for å se tallene slik de er nå.</p>
     </div>
   </section>
@@ -387,7 +390,7 @@
       <ul class="points">
         <li class="r" style="--i:2"><span>01</span><div><strong>Sperrer.</strong> Triage, test, review, verify, CI og sjekken etter merge kan alle stoppe en endring. Du bygger dem én om gangen.</div></li>
         <li class="r" style="--i:3"><span>02</span><div><strong>Lur sperrene.</strong> Prøv å få en dårlig endring forbi hver sperre. Har du aldri sett en sperre stoppe en dårlig endring, kan du ikke stole på den.</div></li>
-        <li class="r" style="--i:4"><span>03</span><div><strong>Vanlig kode.</strong> Agentene foreslår endringer, men det er tester, build og CI som bestemmer om de slipper gjennom.</div></li>
+        <li class="r" style="--i:4"><span>03</span><div><strong>Tradisjonell kode.</strong> Agentene foreslår endringer, men det er tester, build og CI som bestemmer om de slipper gjennom.</div></li>
         <li class="r" style="--i:5"><span>04</span><div><strong>Unntak.</strong> Du ser bare saker som en sperre har stoppet. Da står svaret fra sperren som en kommentar i issuen.</div></li>
       </ul>
       <p class="note r" style="--i:6">Ingen fabrikk er feilfri, så målet er at du har sett hver sperre stoppe en dårlig endring, at hver merge kan reverteres, og at sjekken etter merge finner feil som tidligere sperrer slipper gjennom.</p>
@@ -398,7 +401,7 @@
     <div class="slide-inner split">
       <div>
         <h2 class="r" style="--i:1">Hva fabrikken består av</h2>
-        <p class="lead r" style="--i:2">Fabrikken er en mappe, <code>factory/</code>, med prompter i markdown og noen bash-skript. Hver prompt beskriver ett steg, for eksempel triage eller review. Skriptene sender promptene i rekkefølge til en agent (<code>claude -p</code> eller <code>copilot -p</code>) på din egen maskin, og stopper saken ved første sperre som sier nei. To av sperrene, verify og CI, er vanlig kode som ikke stoler på det agentene sier.</p>
+        <p class="lead r" style="--i:2">Fabrikken er en mappe, <code>factory/</code>, med prompter i markdown og noen bash-skript. Hver prompt beskriver ett steg, for eksempel triage eller review. Skriptene sender promptene i rekkefølge til en agent (<code>claude -p</code> eller <code>copilot -p</code>) på din egen maskin, og stopper saken ved første sperre som sier nei. To av sperrene, verify og CI, er tradisjonell kode som ikke stoler på det agentene sier.</p>
       </div>
       <ul class="stack">
         <li class="r" style="--i:3"><span>Kontekst</span><div><code>factory/context.md</code>, som alle stegene leser</div></li>
@@ -600,7 +603,7 @@ EOF</pre><button class="copy" data-copy>Kopier</button></div></div></div>
       <div class="kicker r" style="--i:0">Oppgave 2 · Triage</div>
       <h2 class="r" style="--i:1">Lag triage-steget</h2>
       <div class="steps">
-        <div class="step r" style="--i:2"><div class="step-num">2.1</div><div><p class="step-text">Triage-prompten. Steget kan bare lese filer, og første linje i svaret er en beslutning som vanlig kode kan lese.</p>
+        <div class="step r" style="--i:2"><div class="step-num">2.1</div><div><p class="step-text">Triage-prompten. Steget kan bare lese filer, og første linje i svaret er en beslutning som tradisjonell kode kan lese.</p>
           <div class="cmd file md"><span class="cmd-where">Terminal</span><pre>cat &gt; factory/1-triage.md &lt;&lt;'EOF'
 Du er triage-steget i en programvarefabrikk. Les saken i &lt;input&gt; og koden i src/. Ikke endre noen filer.
 Finn årsaken, og velg ett av disse:
@@ -757,7 +760,7 @@ EOF</pre><button class="copy" data-copy>Kopier</button></div></div></div>
         <div class="step r" style="--i:2"><div class="step-num">6.1</div><div><p class="step-text">Skriptet skjuler fiksen og sjekker at testene feiler. Så legger det fiksen tilbake og sjekker at testene og buildet går gjennom.</p>
           <div class="cmd file"><span class="cmd-where">Terminal</span><pre>cat &gt; factory/verify.sh &lt;&lt;'EOF' &amp;&amp; chmod +x factory/verify.sh
 #!/usr/bin/env bash
-# Verify er vanlig kode, ikke en agent. Rødt uten fiksen, grønt med den, og et build som går gjennom.
+# Verify er tradisjonell kode, ikke en agent. Rødt uten fiksen, grønt med den, og et build som går gjennom.
 # Bruk: factory/verify.sh &lt;kjøremappe&gt;
 set -uo pipefail
 run=$1

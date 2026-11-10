@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# Verify er vanlig kode, ikke en agent. Rødt uten fiksen, grønt med den, og et build som går gjennom.
+# Verify er tradisjonell kode, ikke en agent. Rødt uten fiksen, grønt med den, og et build som går gjennom.
 # Bruk: factory/verify.sh <kjøremappe>
 set -uo pipefail
 run=$1

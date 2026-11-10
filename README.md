@@ -6,7 +6,7 @@ Du bygger en loop som tar en feilmelding fra matbestillingsappen Woltora helt ut
 
 ```
 issue med label factory ─→ triage ─→ test ─→ build ─→ review ─→ verify ─→ ship.sh: PR, CI, merge til main, sjekk etterpå
-        ↑  watch.sh          agent     agent   agent    agent   vanlig kode
+        ↑  watch.sh          agent     agent   agent    agent   tradisjonell kode
         └──────────── monitor (agent) melder neste sak ───────────────────────────────────────────┘
    Stopper et steg saken, får et menneske svaret som en kommentar i issuen.
    Alle stegene leser factory/context.md, og alle kjøringer havner i runs/log.jsonl.

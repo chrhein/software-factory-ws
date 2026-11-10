@@ -2,10 +2,7 @@
 
 ## Før workshopen
 
-1. Gjør malen offentlig. Lysbildene (oppgave 0.3) forventer `chrhein/software-factory-ws`, og den er privat nå:
-   ```bash
-   gh repo edit chrhein/software-factory-ws --visibility public --accept-visibility-change-consequences
-   ```
+1. Del lenken til lysbildene: https://chrhein.github.io/software-factory-ws/workshop.html. Malen `chrhein/software-factory-ws` er offentlig, og GitHub Pages publiserer `main`, så lysbildene oppdateres når du pusher.
 2. Be deltakerne gjøre oppgave 0 før de kommer (Node 24, `gh auth login`, Chrome og innlogget `claude` eller `copilot`), og kjøre `npx -y @playwright/mcp@0.0.83 --help` én gang, så pakken er lastet ned før oppgave 7.
 3. Gjør en testkjøring i et nytt repo laget fra malen. Den tar et kvarter:
    ```bash
@@ -19,7 +16,7 @@
    Sak 09 skal stoppe med et utkast til en spec i issuen. Lim utkastet inn i beskrivelsen og sett på labelen igjen. Da skal triage si `automatable`. Stopp så `watch.sh`, og kjør `factory/learn.sh && git diff factory` for å se at læresteget finner issuen.
    Kjør den én gang til med `cp ../software-factory-ws/solution/copilot/stage.sh factory/` for å teste Copilot-varianten.
 
-   Sjekk særlig to ting som ikke er testet mot ekte GitHub ennå: at `ship.sh` finner CI-kjøringen med `gh run list --commit`, og at knappen «Meld fra om en feil» setter labelen `factory`. Kjør også steg 0.7 én gang, og se at deployen til Pages går gjennom når variabelen `PAGES` er satt.
+   Sjekk særlig at knappen «Meld fra om en feil» setter labelen `factory`. Det er ikke testet mot ekte GitHub ennå. Kjør også steg 0.7 én gang, og se at deployen til Pages går gjennom når variabelen `PAGES` er satt.
 
 ## Copilot CLI er bare testet med en stub
 

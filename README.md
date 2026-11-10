@@ -17,14 +17,14 @@ issue med label factory ─→ triage ─→ test ─→ build ─→ review ─
 | Del |
 |---|
 | Hva en programvarefabrikk er, og hva som skal til for å shippe uten å lese koden |
-| Oppgave 0–6: stage.sh, triage, test, build, review og verify |
+| Oppgave 0–6: oppsett, motoren (stage.sh), triage, test, build, review og verify |
 | Oppgave 7–12: fiks og ship med øynene lukket. Sjekk i nettleseren, ship.sh, run.sh, trigger fra en issue, overvåking og lur fabrikken |
 | Diskusjon: Stoler du på den? |
-| Ekstra: dommer, benchmark og en fabrikk som lærer |
+| Ekstra, oppgave 13–15: dommer, benchmark og en fabrikk som lærer |
 
 ## Lysbilder
 
-Åpne `workshop.html` i en nettleser, og bla med piltastene. Med `#14` i URL-en hopper du til lysbilde 14. Alle kommandoer og filer har en kopieringsknapp.
+Lysbildene ligger på [chrhein.github.io/software-factory-ws/workshop.html](https://chrhein.github.io/software-factory-ws/workshop.html). Du kan også åpne `workshop.html` lokalt i en nettleser. Bla med piltastene. Med `#14` i URL-en hopper du til lysbilde 14. Alle kommandoer og filer har en kopieringsknapp.
 
 ## Filer
 

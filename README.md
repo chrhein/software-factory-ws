@@ -36,5 +36,6 @@ Lysbildene ligger på [chrhein.github.io/software-factory-ws/workshop.html](http
 | `.github/workflows/ci.yml` | Tester hver pull request og hver push til `main`. Deployer `main` til GitHub Pages hvis du har skrudd det på (frivillig, oppgave 0.7) |
 | `.claude/settings.json` | Skjuler lysbildene, fasiten og fasilitatorguiden for Claude Code, så agentene ikke ser svarene |
 | `src/` | Woltora. `npm test`, `npm run build`, `npm run dev` |
+| `monitor/` | Fabrikkmonitoren (oppgave 0.8). `node monitor/server.mjs` viser stegene du har bygget i `factory/` som en graf på `http://localhost:4777`, og hva agentene gjør mens de kjører. Den leser bare. Bygger på [kseglem/factory-monitor](https://github.com/kseglem/factory-monitor) |
 
 Du trenger Node 24, `gh`, Chrome (til Playwright MCP i oppgave 7) og enten Claude Code eller Copilot CLI. Fasilitatorer: Se [FACILITATOR.md](FACILITATOR.md).

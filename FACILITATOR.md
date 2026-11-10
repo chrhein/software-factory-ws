@@ -4,10 +4,12 @@
 
 1. Del lenken til lysbildene: https://chrhein.github.io/software-factory-ws/workshop.html. Malen `chrhein/software-factory-ws` er offentlig, og GitHub Pages publiserer `main`, så lysbildene oppdateres når du pusher.
 2. Be deltakerne gjøre oppgave 0 før de kommer (Node 24, `gh auth login`, Chrome og innlogget `claude`, `copilot` eller `codex`), og kjøre `npx -y @playwright/mcp@0.0.83 --help` én gang, så pakken er lastet ned før oppgave 7.
+   Når workshopen begynner, ber du alle starte monitoren fra oppgave 0.8 i en egen fane, så de ser stegene dukke opp mens de bygger.
 3. Gjør en testkjøring i et nytt repo laget fra malen. Den tar et kvarter:
    ```bash
    gh repo create woltora-test --private --clone --template chrhein/software-factory-ws && cd woltora-test && npm ci && mkdir -p runs
    gh label create factory
+   node monitor/server.mjs &                               # åpne http://localhost:4777 og følg med
    cp -r ../software-factory-ws/solution/factory . && git add factory && git commit -m factory && git push
    factory/run.sh backlog/03-sok-skiller-store-sma.md     # hele veien til main
    factory/watch.sh                                        # i en egen fane, og lag så en issue fra appen

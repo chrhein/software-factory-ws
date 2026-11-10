@@ -1,0 +1,917 @@
+<!doctype html>
+<html lang="nb" data-brand="bekk" data-theme="bekk-ild" data-color-scheme="light">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Fabrikkmonitor</title>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@kilden/design-tokens@0.2.1/dist/index.css">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@kilden/designsystem@0.4.1/dist/fonts/bekk.css">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+:root {
+  /* The same Kilden tokens as workshop.html. The fallbacks are for when the CDN is unreachable. */
+  --ink: var(--color-neutral-text-default, #0e0e0e);
+  --muted: color-mix(in srgb, var(--color-neutral-text-subtle, #6b6b6b) 55%, var(--ink));
+  --faint: var(--color-neutral-border-default, #bdbdbd);
+  --paper: var(--color-dominant-background-tinted, #fbf6f1);
+  --white: var(--color-neutral-surface-default, #ffffff);
+  --accent: var(--color-accent-base-default, #ff8034);
+  --line: var(--color-neutral-border-subtle, #e2ddd8);
+  --surface-2: color-mix(in srgb, var(--paper) 60%, var(--white));
+  --good: #1f8a3b; --warn: #c98a00; --serious: #d9622b; --critical: var(--color-danger-text-default, #c62828);
+  --add-bg: #e3f3e6; --del-bg: #fbe5e5;
+  --display: var(--font-family-display, system-ui), sans-serif;
+  --action: var(--font-family-action, system-ui), sans-serif;
+  --mono: 'DM Mono', ui-monospace, monospace;
+}
+* { box-sizing: border-box; }
+html, body { margin: 0; }
+body { background: var(--paper); color: var(--ink); font: 15px/1.45 var(--display); -webkit-font-smoothing: antialiased; overflow-x: hidden; }
+button { font: inherit; color: inherit; }
+code, pre, .mono { font-family: var(--mono); font-size: 12.5px; }
+a { color: inherit; }
+
+/* ---------- top bar, like the slides ---------- */
+header.top { position: sticky; top: 0; z-index: 20; background: var(--paper); border-bottom: 1px solid var(--line); }
+.top-inner { max-width: 1480px; margin: 0 auto; padding: 8px 20px; min-height: 52px; display: flex; gap: 10px 20px; align-items: center; flex-wrap: wrap; }
+.brand { display: flex; align-items: center; gap: 12px; min-width: 0; }
+.brand-mark { display: grid; place-items: center; height: 28px; padding: 0 12px; border-radius: 14px; background: var(--accent); font: 500 13px var(--display); white-space: nowrap; }
+.brand .repo { color: var(--muted); font: 11px var(--mono); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.top-status { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; margin-left: auto; }
+.pill { display: inline-flex; align-items: center; gap: 7px; padding: 4px 12px; border-radius: 999px; border: 1px solid var(--line); background: var(--white); font: 12px var(--mono); white-space: nowrap; }
+.pill.live { border-color: var(--ink); background: var(--accent); }
+.dot { width: 8px; height: 8px; border-radius: 50%; background: var(--faint); flex: none; }
+.dot.on { background: var(--ink); animation: ping 1.6s infinite; }
+.dot.ok { background: var(--good); }
+@keyframes ping { 0% { box-shadow: 0 0 0 0 rgb(0 0 0 / .35); } 100% { box-shadow: 0 0 0 8px transparent; } }
+.icon-btn { border: 1px solid var(--ink); background: var(--white); border-radius: 999px; padding: 4px 12px; cursor: pointer; font: 500 11px var(--action); letter-spacing: .08em; text-transform: uppercase; }
+.icon-btn:hover { background: var(--accent); }
+
+main { max-width: 1480px; margin: 0 auto; padding: 20px 20px 60px; display: grid; gap: 20px; }
+
+/* ---------- cards ---------- */
+.card { background: var(--white); border: 1px solid var(--line); min-width: 0; }
+.card > h2 { margin: 0; padding: 16px 20px 0; display: flex; align-items: center; gap: 10px; font: 500 11px var(--action); letter-spacing: .1em; text-transform: uppercase; color: var(--muted); }
+.card > h2 .meta { margin-left: auto; text-transform: none; letter-spacing: 0; font: 12px var(--display); color: var(--muted); }
+.card .body { padding: 12px 20px 20px; }
+.empty { color: var(--muted); font-size: 14px; padding: 6px 0; }
+.grid-2 { display: grid; grid-template-columns: minmax(0, 1.55fr) minmax(0, 1fr); gap: 20px; align-items: start; }
+.stack { display: grid; gap: 20px; min-width: 0; }
+@media (max-width: 1100px) { .grid-2 { grid-template-columns: minmax(0, 1fr); } }
+
+/* ---------- the production line, drawn like the flow diagrams on the slides ---------- */
+.g-card { background: var(--paper); border-color: var(--line); }
+.g-card .body { padding: 8px 20px 24px; }
+.g-label { font: 500 11px var(--action); letter-spacing: .1em; text-transform: uppercase; color: var(--muted); margin: 16px 0 14px; display: flex; gap: 12px; align-items: center; flex-wrap: wrap; }
+.g-label:first-child { margin-top: 8px; }
+.g-lane { display: flex; flex-wrap: wrap; align-items: flex-start; row-gap: 28px; }
+.g-lane.loose { gap: 28px 20px; }
+.g-col { display: flex; flex-direction: column; align-items: center; }
+.g-track { flex: none; width: 40px; height: 96px; position: relative; }
+.g-track::before { content: ""; position: absolute; left: 0; right: 10px; top: 46.5px; height: 3px; background: var(--ink); }
+.g-track::after { content: ""; position: absolute; right: 0; top: 39.5px; border-left: 16px solid var(--ink); border-top: 8.5px solid transparent; border-bottom: 8.5px solid transparent; }
+.g-node { position: relative; width: 188px; height: 96px; padding: 8px 16px; border: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; cursor: pointer; transition: outline-color .2s, transform .2s; outline: 4px solid transparent; outline-offset: 4px; }
+.g-node:hover { transform: translateY(-2px); }
+.g-node:focus-visible { outline-color: var(--ink); }
+.g-node .nm { font: 500 20px var(--display); letter-spacing: -.02em; line-height: 1.15; }
+.g-node .sb { font: 12px var(--mono); margin-top: 4px; overflow-wrap: anywhere; }
+.g-node .ct { font: 11px var(--mono); margin-top: 3px; opacity: .75; }
+.g-agent { background: var(--ink); color: var(--paper); border-radius: 999px; }
+.g-agent .sb { color: color-mix(in srgb, var(--paper) 78%, var(--ink)); }
+.g-code { background: var(--white); color: var(--ink); box-shadow: inset 0 0 0 2.5px var(--ink); }
+.g-human { background: var(--accent); color: var(--ink); box-shadow: inset 0 0 0 2.5px var(--ink); cursor: default; }
+.g-human:hover { transform: none; }
+.g-node.on { outline-color: var(--accent); animation: glow 1.6s ease-in-out infinite; }
+@keyframes glow { 50% { outline-offset: 7px; } }
+.g-badge { position: absolute; top: -13px; right: 10px; padding: 2px 9px; border-radius: 999px; background: var(--accent); color: var(--ink); border: 1.5px solid var(--ink); font: 500 11px var(--mono); white-space: nowrap; }
+.g-down { position: relative; width: 3px; height: 52px; background: var(--ink); margin: 0 0 12px; }
+.g-down::after { content: ""; position: absolute; left: -7px; bottom: -12px; border-top: 16px solid var(--ink); border-left: 8.5px solid transparent; border-right: 8.5px solid transparent; }
+.g-down span { position: absolute; left: 14px; top: 14px; white-space: nowrap; font: 500 11px var(--action); letter-spacing: .08em; text-transform: uppercase; }
+.g-hub { margin-top: 30px; padding: 16px 22px; border: 1.5px dashed var(--ink); border-radius: 12px; background: var(--white); display: flex; flex-wrap: wrap; gap: 6px 36px; align-items: baseline; cursor: pointer; width: 100%; text-align: left; }
+.g-hub:hover { background: var(--surface-2); }
+.g-hub .hl { font: 500 11px var(--action); letter-spacing: .12em; text-transform: uppercase; width: 100%; }
+.g-hub .ht { font: 500 20px var(--display); letter-spacing: -.01em; }
+.g-orch { display: inline-flex; align-items: center; gap: 8px; text-transform: none; letter-spacing: 0; font: 12px var(--mono); color: var(--ink); padding: 3px 12px; border: 1px solid var(--ink); background: var(--white); cursor: pointer; }
+.g-orch.on { background: var(--accent); }
+.legend { display: flex; gap: 28px; flex-wrap: wrap; margin-top: 22px; font: 14px var(--display); }
+.legend span { display: flex; align-items: center; gap: 10px; }
+.swatch { display: inline-block; width: 32px; height: 20px; border: 2px solid var(--ink); background: var(--white); }
+.swatch--agent { background: var(--ink); border-radius: 999px; }
+.swatch--human { background: var(--accent); }
+
+/* ---------- chips ---------- */
+.chip { display: inline-flex; align-items: center; gap: 5px; padding: 2px 10px; border-radius: 999px; border: 1px solid var(--line); background: var(--white); font: 12px var(--mono); white-space: nowrap; color: var(--ink); line-height: 1.6; }
+.chip .ic { font-weight: 700; font-size: 11px; width: 12px; text-align: center; }
+.chip.good { background: color-mix(in srgb, var(--good) 12%, var(--white)); border-color: color-mix(in srgb, var(--good) 45%, transparent); }
+.chip.good .ic { color: var(--good); }
+.chip.warn { background: color-mix(in srgb, var(--warn) 16%, var(--white)); border-color: color-mix(in srgb, var(--warn) 55%, transparent); }
+.chip.warn .ic { color: var(--warn); }
+.chip.serious { background: color-mix(in srgb, var(--serious) 14%, var(--white)); border-color: color-mix(in srgb, var(--serious) 50%, transparent); }
+.chip.serious .ic { color: var(--serious); }
+.chip.critical { background: color-mix(in srgb, var(--critical) 12%, var(--white)); border-color: color-mix(in srgb, var(--critical) 45%, transparent); }
+.chip.critical .ic { color: var(--critical); }
+.chip.running { background: var(--accent); border-color: var(--ink); }
+.chip.running .ic { animation: spin 1.2s linear infinite; display: inline-block; }
+@keyframes spin { to { transform: rotate(360deg); } }
+.chip .sec { color: var(--muted); font-size: 11px; }
+.tag { display: inline-block; padding: 1px 7px; border-radius: 999px; background: var(--paper); border: 1px solid var(--line); font: 11.5px var(--mono); margin: 2px 4px 2px 0; white-space: nowrap; }
+.tag.deny { background: color-mix(in srgb, var(--critical) 12%, var(--white)); text-decoration: line-through; text-decoration-color: var(--critical); }
+
+/* ---------- now ---------- */
+.proc { display: grid; gap: 4px; margin-bottom: 14px; }
+.proc-row { display: flex; gap: 8px; align-items: baseline; flex-wrap: wrap; min-width: 0; }
+.proc-row .script { font: 500 13px var(--mono); }
+.proc-row .args { font: 12.5px var(--mono); color: var(--muted); overflow-wrap: anywhere; }
+.proc-row .el { font: 12px var(--mono); font-variant-numeric: tabular-nums; }
+.proc-child { font: 12px var(--mono); color: var(--muted); overflow-wrap: anywhere; }
+.perm { margin: 6px 0 10px; padding: 8px 12px; background: var(--paper); font-size: 12px; }
+.perm b { font: 500 10px var(--action); letter-spacing: .1em; text-transform: uppercase; color: var(--muted); margin-right: 6px; }
+.now-head { display: flex; gap: 10px; align-items: baseline; flex-wrap: wrap; margin-bottom: 10px; }
+.now-head .title { font: 500 20px var(--display); letter-spacing: -.02em; }
+.now-head .sub { color: var(--muted); font-size: 13px; }
+.trace { max-height: 520px; overflow-y: auto; border: 1px solid var(--line); background: var(--white); }
+.ev { display: grid; grid-template-columns: 56px 22px minmax(0, 1fr); gap: 0 6px; padding: 6px 10px; border-bottom: 1px solid var(--line); align-items: start; }
+.ev:last-child { border-bottom: 0; }
+.ev .t { color: var(--muted); font: 11px var(--mono); font-variant-numeric: tabular-nums; padding-top: 2px; }
+.ev .i { text-align: center; font-size: 12px; padding-top: 1px; color: var(--muted); }
+.ev .what { min-width: 0; }
+.ev .tool { font-weight: 500; font-size: 13px; margin-right: 6px; }
+.ev .target { font: 12px var(--mono); color: var(--muted); overflow-wrap: anywhere; }
+.ev .desc { color: var(--muted); font-size: 12px; }
+.ev.err .i { color: var(--critical); }
+.ev.err .tool::after { content: " · stoppet eller feilet"; font-weight: 400; color: var(--critical); font-size: 12px; }
+.ev.text { background: var(--paper); }
+.ev.text .what { font-size: 14px; }
+.ev.thinking .what { color: var(--muted); font-style: italic; font-size: 13px; white-space: pre-wrap; }
+.ev.pending .i { color: var(--ink); animation: spin 1.2s linear infinite; }
+.ev details { margin-top: 3px; }
+.ev summary { cursor: pointer; color: var(--muted); font-size: 12px; }
+.ev pre.out { margin: 4px 0 0; max-height: 260px; overflow: auto; background: var(--paper); padding: 8px; white-space: pre-wrap; overflow-wrap: anywhere; }
+.diff { margin: 4px 0 0; overflow: hidden; border: 1px solid var(--line); }
+.diff div { font: 12px var(--mono); white-space: pre-wrap; overflow-wrap: anywhere; padding: 0 8px; }
+.diff .del { background: var(--del-bg); }
+.diff .add { background: var(--add-bg); }
+.diff .ctx { color: var(--muted); }
+.diff .hunk { color: var(--muted); background: var(--paper); }
+.foot { display: flex; gap: 14px; flex-wrap: wrap; align-items: center; color: var(--muted); font: 12px var(--mono); margin-top: 10px; }
+
+/* ---------- runs table ---------- */
+.table-wrap { overflow-x: auto; margin: 0 -20px; padding: 0 20px; }
+table.runs { border-collapse: collapse; width: 100%; }
+table.runs th { text-align: left; font: 500 10px var(--action); letter-spacing: .1em; text-transform: uppercase; color: var(--muted); padding: 8px 6px; border-bottom: 1px solid var(--ink); white-space: nowrap; }
+table.runs td { padding: 9px 6px; border-bottom: 1px solid var(--line); vertical-align: top; }
+table.runs tr.is-live td { background: color-mix(in srgb, var(--accent) 14%, transparent); }
+.run-name { cursor: pointer; display: block; text-align: left; border: 0; background: none; padding: 0; max-width: 240px; }
+.run-name .rn { font: 500 12.5px var(--mono); }
+.run-name .tt { display: block; font-size: 13px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.run-name .age { display: block; color: var(--muted); font-size: 12px; }
+.run-name:hover .tt { text-decoration: underline; }
+button.chip { cursor: pointer; }
+button.chip:hover { border-color: var(--ink); }
+.dash { color: var(--faint); }
+
+/* ---------- side cards ---------- */
+.lessons { margin: 0; padding-left: 20px; }
+.lessons li { margin: 5px 0; }
+.lessons li.fresh { animation: flash 3s ease-out; }
+@keyframes flash { from { background: var(--accent); } to { background: transparent; } }
+.kv { display: grid; grid-template-columns: max-content minmax(0, 1fr); gap: 4px 12px; font-size: 14px; }
+.kv dt { color: var(--muted); }
+.kv dd { margin: 0; min-width: 0; overflow-wrap: anywhere; }
+.files { list-style: none; margin: 6px 0 0; padding: 0; font: 12px var(--mono); }
+.files li { display: flex; gap: 8px; padding: 1px 0; }
+.files .code { width: 22px; flex: none; color: var(--muted); }
+.files .code.M { color: var(--serious); }
+.files .code.A, .files .code.N { color: var(--good); }
+.files .code.D { color: var(--critical); }
+.files .f { overflow-wrap: anywhere; min-width: 0; }
+.subhead { font: 500 10px var(--action); letter-spacing: .1em; text-transform: uppercase; color: var(--muted); margin: 16px 0 6px; }
+.list { list-style: none; margin: 0; padding: 0; }
+.list li { display: flex; gap: 8px; align-items: baseline; padding: 4px 0; font-size: 14px; min-width: 0; border-top: 1px solid var(--line); }
+.list li:first-child { border-top: 0; }
+.list li .n { font: 12px var(--mono); color: var(--muted); flex: none; }
+.list li .tx { min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; flex: 1; }
+.list li .r { flex: none; }
+details.fold > summary { cursor: pointer; font-size: 13px; margin-top: 12px; }
+
+/* ---------- measurements ---------- */
+.tiles { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 10px; margin-bottom: 18px; }
+.tile { border: 1px solid var(--ink); padding: 12px 14px; background: var(--white); }
+.tile .v { font: 500 26px var(--display); letter-spacing: -.02em; }
+.tile .l { font-size: 12px; color: var(--muted); }
+.bars { display: grid; grid-template-columns: max-content minmax(0, 1fr); gap: 6px 12px; align-items: center; }
+.bars .bl { font: 12.5px var(--mono); white-space: nowrap; }
+.bars .track { position: relative; height: 18px; }
+.bars .bar { position: absolute; left: 0; top: 3px; height: 12px; background: var(--ink); border-radius: 0 6px 6px 0; min-width: 2px; }
+.bars .bv { position: absolute; top: 0; font: 12px var(--mono); color: var(--muted); white-space: nowrap; }
+.bars .row { display: contents; }
+.bars .row:hover .bar { background: var(--accent); }
+.log-table { width: 100%; border-collapse: collapse; font-size: 12.5px; }
+.log-table th { text-align: left; font: 500 10px var(--action); letter-spacing: .1em; text-transform: uppercase; color: var(--muted); padding: 4px 6px; border-bottom: 1px solid var(--ink); }
+.log-table td { padding: 4px 6px; border-bottom: 1px solid var(--line); font: 12px var(--mono); vertical-align: top; overflow-wrap: anywhere; }
+.log-table td.num { text-align: right; font-variant-numeric: tabular-nums; }
+.tip { position: fixed; z-index: 60; pointer-events: none; background: var(--ink); color: var(--paper); padding: 6px 10px; font-size: 12px; max-width: 280px; display: none; }
+
+/* ---------- drawer ---------- */
+.scrim { position: fixed; inset: 0; background: rgb(0 0 0 / .25); z-index: 40; display: none; }
+.scrim.open { display: block; }
+.drawer { position: fixed; top: 0; right: 0; bottom: 0; width: min(720px, 100vw); background: var(--white); border-left: 1px solid var(--ink); z-index: 50; transform: translateX(100%); transition: transform .2s ease; display: flex; flex-direction: column; }
+.drawer.open { transform: none; }
+.drawer .dh { padding: 16px 20px; border-bottom: 1px solid var(--line); display: flex; gap: 10px; align-items: flex-start; }
+.drawer .dh h3 { margin: 0; font: 500 22px var(--display); letter-spacing: -.02em; }
+.drawer .dh .sub { color: var(--muted); font-size: 13px; margin-top: 2px; }
+.drawer .dh .icon-btn { margin-left: auto; }
+.drawer .db { padding: 16px 20px 40px; overflow-y: auto; }
+.drawer .db .trace { max-height: none; }
+.md { font-size: 14px; overflow-wrap: anywhere; }
+.md p { margin: 0 0 6px; }
+.md h3, .md h4, .md h5, .md h6 { margin: 12px 0 6px; font-size: 15px; font-weight: 500; }
+.md ul, .md ol { margin: 0 0 8px; padding-left: 20px; }
+.md li { margin: 2px 0; }
+.md code { background: var(--paper); padding: 0 4px; }
+.md pre { background: var(--paper); padding: 10px; overflow: auto; white-space: pre-wrap; }
+.md pre code { background: none; padding: 0; }
+.md .fm { font: 11.5px var(--mono); color: var(--muted); margin-bottom: 8px; white-space: pre-wrap; }
+.box { border: 1px solid var(--line); padding: 12px 14px; background: var(--white); margin-bottom: 14px; }
+pre.src { background: var(--ink); color: var(--paper); padding: 14px; overflow: auto; font-size: 12px; white-space: pre; max-height: 70vh; margin: 0; }
+.err-banner { background: color-mix(in srgb, var(--critical) 12%, var(--white)); border: 1px solid var(--critical); padding: 10px 14px; display: none; }
+
+@media (max-width: 640px) {
+  .top-inner, main { padding-left: 16px; padding-right: 16px; }
+  .brand { max-width: 100%; }
+  .card > h2 { flex-wrap: wrap; }
+  .card > h2 .meta { margin-left: 0; }
+  .g-card .body, .card .body { padding-left: 16px; padding-right: 16px; }
+  .g-node { width: 132px; padding: 8px 10px; }
+  .g-node .sb { font-size: 10.5px; }
+  .g-node .nm { font-size: 17px; }
+  .g-track { width: 28px; }
+  .ev { grid-template-columns: 44px 18px minmax(0, 1fr); }
+}
+@media (prefers-reduced-motion: reduce) { * { animation: none !important; transition: none !important; } }
+</style>
+</head>
+<body>
+<header class="top">
+  <div class="top-inner">
+    <div class="brand"><span class="brand-mark">Fabrikkmonitor</span><span class="repo" id="repo"></span></div>
+    <div class="top-status" id="status"></div>
+  </div>
+</header>
+
+<main>
+  <div class="err-banner" id="err"></div>
+
+  <section class="card g-card">
+    <h2>Fabrikken <span class="meta">tegnet fra det som ligger i factory/ · klikk på et steg for å se prompten eller skriptet</span></h2>
+    <div class="body" id="pipeline"></div>
+  </section>
+
+  <div class="grid-2">
+    <div class="stack">
+      <section class="card"><h2 id="now-h">Nå</h2><div class="body" id="now"></div></section>
+    </div>
+    <div class="stack">
+      <section class="card"><h2>Lærdommer <span class="meta">factory/context.md</span></h2><div class="body" id="lessons"></div></section>
+      <section class="card"><h2>Arbeidskopien <span class="meta">git, bare lesing</span></h2><div class="body" id="git"></div></section>
+      <section class="card"><h2>GitHub <span class="meta" id="gh-meta"></span></h2><div class="body" id="gh"></div></section>
+    </div>
+  </div>
+
+  <section class="card"><h2>Kjøringer <span class="meta" id="runs-meta"></span></h2><div class="body" id="runs"></div></section>
+
+  <section class="card"><h2>Målinger <span class="meta">runs/log.jsonl og agentøktene</span></h2><div class="body" id="stats"></div></section>
+</main>
+
+<aside class="drawer" id="drawer" aria-hidden="true">
+  <div class="dh"><div><h3 id="d-title"></h3><div class="sub" id="d-sub"></div></div><button class="icon-btn" id="d-close">Lukk</button></div>
+  <div class="db" id="d-body"></div>
+</aside>
+<div class="scrim" id="scrim"></div>
+<div class="tip" id="tip"></div>
+
+<script>
+'use strict';
+// ---------------------------------------------------------------- utils
+const $ = (id) => document.getElementById(id);
+const esc = (s) => String(s ?? '').replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+const firstLine = (s) => (s || '').split('\n').find(l => l.trim()) || '';
+const normRun = (r) => String(r || '').replace(/^\.\//, '').replace(/^runs\//, '').replace(/\/+$/, '');
+const plural = (n, one, many) => `${n} ${n === 1 ? one : many}`;
+function fmtDur(sec) {
+  sec = Math.max(0, Math.round(sec));
+  if (sec < 60) return sec + ' s';
+  const m = Math.floor(sec / 60), s = sec % 60;
+  if (m < 60) return `${m}:${String(s).padStart(2, '0')}`;
+  return `${Math.floor(m / 60)} t ${String(m % 60).padStart(2, '0')} min`;
+}
+function ago(ms) {
+  if (!ms) return '';
+  const s = (Date.now() - ms) / 1000;
+  if (s < 10) return 'akkurat nå';
+  if (s < 60) return `for ${Math.round(s)} s siden`;
+  if (s < 3600) return `for ${Math.round(s / 60)} min siden`;
+  if (s < 86400) return `for ${Math.round(s / 3600)} t siden`;
+  return new Date(ms).toLocaleDateString('nb-NO');
+}
+const clock = (ms) => ms ? new Date(ms).toLocaleTimeString('nb-NO', { hour: '2-digit', minute: '2-digit', second: '2-digit' }) : '';
+const usd = (n) => n == null ? '–' : '$' + n.toFixed(n < 1 ? 3 : 2);
+
+function inline(t) {
+  let s = esc(t);
+  s = s.replace(/`([^`]+)`/g, '<code>$1</code>');
+  s = s.replace(/\*\*([^*]+)\*\*/g, '<strong>$1</strong>');
+  s = s.replace(/\[([^\]]+)\]\((https?:\/\/[^)\s"]+)\)/g, '<a href="$2" target="_blank" rel="noopener noreferrer">$1</a>');
+  return s;
+}
+function md(src) {
+  if (!src) return '';
+  let s = src.replace(/\r\n/g, '\n'), fm = '';
+  const f = s.match(/^---\n([\s\S]*?)\n---\n?/);
+  if (f) { fm = f[1]; s = s.slice(f[0].length); }
+  const out = []; let code = null, list = null;
+  const flush = () => { if (list) { out.push(`<${list.t}>${list.items.map(i => `<li>${inline(i)}</li>`).join('')}</${list.t}>`); list = null; } };
+  for (const line of s.split('\n')) {
+    if (/^\s*```/.test(line)) { if (code) { out.push(`<pre><code>${esc(code.join('\n'))}</code></pre>`); code = null; } else { flush(); code = []; } continue; }
+    if (code) { code.push(line); continue; }
+    let m;
+    if ((m = line.match(/^(#{1,6})\s+(.*)$/))) { flush(); const n = Math.min(m[1].length + 2, 6); out.push(`<h${n}>${inline(m[2])}</h${n}>`); continue; }
+    if ((m = line.match(/^\s*[-*•]\s+(.*)$/))) { if (list?.t !== 'ul') { flush(); list = { t: 'ul', items: [] }; } list.items.push(m[1]); continue; }
+    if ((m = line.match(/^\s*\d+[.)]\s+(.*)$/))) { if (list?.t !== 'ol') { flush(); list = { t: 'ol', items: [] }; } list.items.push(m[1]); continue; }
+    if (!line.trim()) { flush(); continue; }
+    flush(); out.push(`<p>${inline(line)}</p>`);
+  }
+  if (code) out.push(`<pre><code>${esc(code.join('\n'))}</code></pre>`);
+  flush();
+  return (fm ? `<div class="fm">${esc(fm)}</div>` : '') + out.join('');
+}
+
+function verdict(content) {
+  const first = firstLine(content).replace(/^[#*\s]+/, '');
+  let m;
+  if ((m = first.match(/^DECISION:\s*([\w-]+)/i))) return { label: m[1], tone: { automatable: 'good', 'needs-spec': 'warn', 'needs-human': 'critical' }[m[1].toLowerCase()] || 'neutral' };
+  if ((m = first.match(/^REVIEW:\s*([\w-]+)/i))) return { label: m[1], tone: /approve/i.test(m[1]) ? 'good' : 'serious' };
+  if ((m = first.match(/^[A-ZÆØÅ-]+:\s*(pass|fail)\b/i))) return { label: m[1], tone: /pass/i.test(m[1]) ? 'good' : 'critical' };
+  if ((m = first.match(/^SCORE:\s*([\d.]+)/i))) return { label: m[1] + '/10', tone: 'neutral' };
+  if ((m = first.match(/^LEARN:\s*([\w-]+)/i))) return { label: m[1], tone: 'neutral' };
+  if (/^SHIPPET/i.test(first)) return { label: 'shippet', tone: 'good' };
+  if (/^FEIL PÅ MAIN/i.test(first)) return { label: 'feil på main', tone: 'critical' };
+  if (/^STOPPET/i.test(first)) return { label: 'stoppet', tone: 'serious' };
+  return { label: 'ferdig', tone: 'neutral' };
+}
+const ICON = { good: '✓', warn: '?', serious: '!', critical: '✕', neutral: '•', running: '◠' };
+const chip = (v, extra = '', attrs = '') => `<${attrs ? 'button' : 'span'} class="chip ${v.tone}" ${attrs}><span class="ic" aria-hidden="true">${ICON[v.tone] || '•'}</span>${esc(v.label)}${extra}</${attrs ? 'button' : 'span'}>`;
+const TOOL_ICON = { Read: '▤', Grep: '⌕', Glob: '⌕', Edit: '✎', MultiEdit: '✎', Write: '✎', Bash: '$', ToolSearch: '⌕' };
+const toolIcon = (n) => TOOL_ICON[n] || (n.startsWith('mcp__playwright') ? '◳' : '•');
+const toolName = (n) => n.replace(/^mcp__playwright__browser_/, 'browser.').replace(/^mcp__/, '');
+
+// ---------------------------------------------------------------- the factory, read from factory/
+// Nothing about the workshop's steps is hard-coded. Every prompt (N-name.md) is an agent, every script is code,
+// and the order comes from the scripts themselves: what run.sh calls, in the order it calls it.
+// A step inside an `if` in run.sh hangs below the step before it. Before run.sh exists, the number in front of
+// each file gives the order, and two files with the same number share a column.
+const reEsc = (s) => s.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+const numOf = (s) => { const m = String(s || '').match(/^(\d+)/); return m ? +m[1] : Infinity; };
+const nice = (s) => { const w = s.replace(/^\d+[a-z]?-/, '').replace(/\.(sh|md)$/, '').replace(/[-_]/g, ' '); return w.charAt(0).toUpperCase() + w.slice(1); };
+
+function buildGraph(F) {
+  const names = Object.keys(F);
+  const prompts = names.filter(n => n.endsWith('.md') && n !== 'context.md').map(n => n.slice(0, -3));
+  const scripts = names.filter(n => n.endsWith('.sh') && n !== 'stage.sh');
+  const mtime = (f) => F[f]?.mtime || 0;
+  // Comments and messages ("Kjør factory/bench.sh først") mention scripts without running them, so they are skipped.
+  const lines = (f) => (F[f]?.content || '').split('\n').filter(l => !/^\s*#/.test(l)).map(l => l.replace(/"[^"]*"|'[^']*'/g, (q) => /\s/.test(q) ? '""' : q));
+
+  // What a script runs, in order. A prompt counts when its name stands alone (`step 2-test`, `stage.sh 5-check`),
+  // not when it is part of a path like "$run/2-test.md". A script counts as `x.sh` or `factory/x.sh`.
+  const callCache = {};
+  function callsOf(file) {
+    if (callCache[file]) return callCache[file];
+    const out = [], seen = new Set(), conds = [];
+    for (const line of lines(file)) {
+      const opens = /^\s*if\b/.test(line) && !/\bfi\s*;?\s*$/.test(line);
+      const refs = [];
+      for (const p of prompts) for (const m of line.matchAll(new RegExp(`(?<![\\w/.$-])${reEsc(p)}(?![\\w.-])`, 'g'))) refs.push([m.index, p]);
+      for (const s of scripts) if (s !== file) for (const m of line.matchAll(new RegExp(`(?<![\\w.-])${reEsc(s)}(?![\\w-])`, 'g'))) refs.push([m.index, s]);
+      for (const [, ref] of refs.sort((a, b) => a[0] - b[0])) {
+        if (seen.has(ref)) continue;
+        seen.add(ref);
+        out.push({ ref, cond: conds.length ? conds.at(-1) : null });
+      }
+      if (opens) conds.push((line.match(/grep\s+(?:-\w+\s+)*["']?([\w-]+)/)?.[1]) || 'betinget');
+      if (/^\s*fi\b/.test(line)) conds.pop();
+    }
+    return (callCache[file] = out);
+  }
+  // Which run files a script writes itself, like "$run/5-verify.md".
+  const writesOf = (f) => [...new Set([...(F[f]?.content || '').matchAll(/(?:>|tee(?:\s+-a)?)\s+"?\$run\/([\w./-]+\.md)/g)].map(m => m[1]))];
+
+  const endFiles = writesOf('run.sh'); // run.sh writes the result of every run, so no single station owns those files
+  const nodes = new Map();
+  for (const p of prompts) nodes.set(p, { id: p, kind: 'agent', label: nice(p), files: [p + '.md'], prompts: [p], script: null, writes: [p + '.md'], out: [], num: numOf(p), mtime: mtime(p + '.md') });
+  for (const s of scripts) {
+    if (s === 'run.sh') continue;
+    const own = callsOf(s).filter(c => nodes.has(c.ref) && prompts.includes(c.ref)).map(c => c.ref);
+    for (const p of own) nodes.delete(p); // a script that runs a prompt through stage.sh is one station: an agent wrapped in code
+    const w = writesOf(s);
+    nodes.set(s, { id: s, kind: own.length ? 'agent' : 'code', label: nice(own[0] || s), files: [s, ...own.map(p => p + '.md')], prompts: own, script: s,
+      writes: [...own.map(p => p + '.md'), ...w.filter(f => !endFiles.includes(f))], out: w, num: own.length ? numOf(own[0]) : numOf(w[0]), mtime: mtime(s) });
+  }
+  const nodeOf = (ref) => nodes.get(ref) || [...nodes.values()].find(n => n.prompts.includes(ref) || n.script === ref) || null;
+  const calledBy = new Map();
+  for (const s of scripts) for (const c of callsOf(s)) { const n = nodeOf(c.ref); if (n && n.script !== s) (calledBy.get(n.id) || calledBy.set(n.id, []).get(n.id)).push(s); }
+
+  // The line: run.sh's calls in order, with what each script calls placed right after it.
+  const placed = new Set();
+  function expand(file) {
+    const cols = [];
+    for (const c of callsOf(file)) {
+      const n = nodeOf(c.ref);
+      if (!n || placed.has(n.id) || n.id === file) continue;
+      placed.add(n.id);
+      if (c.cond && cols.length) { cols.at(-1).branches.push({ node: n, cond: c.cond }); continue; }
+      cols.push({ node: n, branches: [] });
+      if (n.script) cols.push(...expand(n.script));
+    }
+    return cols;
+  }
+  const hasRun = !!F['run.sh'];
+  let line = [];
+  if (hasRun) line = expand('run.sh');
+  else {
+    const roots = [...nodes.values()].filter(n => Number.isFinite(n.num) && !calledBy.has(n.id)).sort((a, b) => a.num - b.num || a.mtime - b.mtime);
+    for (const n of roots) {
+      if (placed.has(n.id)) continue;
+      placed.add(n.id);
+      const prev = line.at(-1);
+      if (prev && prev.node.num === n.num && !prev.node.script && !n.script) { prev.branches.push({ node: n, cond: null }); continue; }
+      line.push({ node: n, branches: [] });
+      if (n.script) line.push(...expand(n.script));
+    }
+  }
+  // A trigger is a script whose only job is to start run.sh, like a loop that waits for issues.
+  const triggers = hasRun ? scripts.filter(s => s !== 'run.sh' && callsOf(s).length && callsOf(s).every(c => c.ref === 'run.sh')).map(s => nodes.get(s)).filter(Boolean) : [];
+  for (const t of triggers) placed.add(t.id);
+  const around = [...nodes.values()].filter(n => !placed.has(n.id)).sort((a, b) => a.num - b.num || a.mtime - b.mtime);
+  const order = [...line.flatMap(c => [c.node, ...c.branches.map(b => b.node)]), ...triggers, ...around];
+  return { nodes, nodeOf, line, triggers, around, order, calledBy, hasRun, callsOf };
+}
+
+// ---------------------------------------------------------------- state + rendering
+let S = null, G = null, lastKeys = {}, drawerCtx = null, seenLessons = null;
+
+function renderSection(id, key, html) {
+  if (lastKeys[id] === key) return;
+  lastKeys[id] = key;
+  const el = $(id);
+  // keep open <details> and scroll positions across re-renders
+  const open = new Set([...el.querySelectorAll('details[data-k][open]')].map(d => d.dataset.k));
+  const scrolls = [...el.querySelectorAll('[data-scroll]')].map(x => [x.dataset.scroll, x.scrollTop, x.scrollHeight - x.scrollTop - x.clientHeight < 30]);
+  el.innerHTML = html();
+  el.querySelectorAll('details[data-k]').forEach(d => { if (open.has(d.dataset.k)) d.open = true; });
+  for (const [k, top, atBottom] of scrolls) {
+    const x = el.querySelector(`[data-scroll="${k}"]`);
+    if (x) x.scrollTop = atBottom ? x.scrollHeight : top;
+  }
+  el.querySelectorAll('[data-scroll][data-stick]').forEach(x => { if (!scrolls.length) x.scrollTop = x.scrollHeight; });
+}
+
+// Which station each running process belongs to.
+function activeNodes() {
+  const m = new Map();
+  for (const p of S.active) {
+    const n = p.script === 'stage.sh' ? G.nodeOf(p.args[0]) : G.nodeOf(p.script);
+    if (n && !m.has(n.id)) m.set(n.id, p);
+  }
+  return m;
+}
+// "runs/x/check" → run "x", files under "check/"
+function splitRun(r) { const parts = normRun(r).split('/'); return { run: parts[0], prefix: parts.slice(1).map(x => x + '/').join('') }; }
+// (run, file) → running process
+function activeCells() {
+  const m = new Map();
+  for (const p of S.active) {
+    if (!p.args[0]) continue;
+    if (p.script === 'stage.sh' && p.args[1]) { const { run, prefix } = splitRun(p.args[1]); m.set(`${run}|${prefix}${p.args[0]}.md`, p); continue; }
+    const w = G.nodeOf(p.script)?.out[0];
+    if (w) m.set(`${normRun(p.args[0])}|${w}`, p);
+  }
+  return m;
+}
+const sessionFor = (run, file) => [...S.sessions].reverse().find(s => s.run === run && s.file === file) || null;
+const runsWith = (n) => S.runs.filter(r => r.files.some(f => n.writes.includes(f.name.replace(/^.*\//, '')) || n.writes.includes(f.name))).length;
+
+function renderHeader() {
+  const act = S.active;
+  const watchers = act.filter(p => G.triggers.some(t => t.script === p.script));
+  const top = act.filter(p => !watchers.includes(p));
+  const deepest = top.filter(p => !top.some(q => q.parent === p.pid)).at(-1);
+  const pills = [];
+  if (deepest) pills.push(`<span class="pill live"><span class="dot on"></span>${esc(deepest.script)} ${esc(deepest.args.join(' '))} · <span data-since="${deepest.start}"></span></span>`);
+  else pills.push(`<span class="pill"><span class="dot"></span>Ingenting kjører</span>`);
+  for (const p of watchers) pills.push(`<span class="pill"><span class="dot ok"></span>${esc(p.script)} kjører</span>`);
+  pills.push(`<span class="pill" title="Siste oppdatering"><span class="dot ok"></span>live · <span id="polled">nå</span></span>`);
+  $('repo').textContent = S.repo;
+  renderSection('status', JSON.stringify([deepest?.pid, deepest?.args, watchers.map(p => p.pid)]), () => pills.join(''));
+}
+
+function renderPipeline() {
+  const act = activeNodes();
+  const runOn = S.active.find(p => p.script === 'run.sh');
+  const lessons = lessonsOf(S.factory['context.md']?.content).length;
+  const key = JSON.stringify([Object.entries(S.factory).map(([n, f]) => [n, f.mtime]), [...act.entries()].map(([k, p]) => [k, p.pid]), runOn?.pid, S.runs.map(r => r.files.length), lessons]);
+  renderSection('pipeline', key, () => {
+    const node = (n) => {
+      const p = act.get(n.id), c = runsWith(n);
+      const cls = n.kind === 'agent' ? 'g-agent' : 'g-code';
+      return `<button class="g-node ${cls} ${p ? 'on' : ''}" data-node="${esc(n.id)}" title="${n.kind === 'agent' ? 'Agent' : 'Tradisjonell kode'}">
+        ${p ? `<span class="g-badge">kjører <span data-since="${p.start}"></span></span>` : ''}
+        <span class="nm">${esc(n.label)}</span><span class="sb">${n.files.map(esc).join(' · ')}</span>
+        ${c ? `<span class="ct">${plural(c, 'kjøring', 'kjøringer')}</span>` : ''}</button>`;
+    };
+    const track = '<span class="g-track" aria-hidden="true"></span>';
+    const branch = (b) => `<span class="g-down" aria-hidden="true">${b.cond ? `<span>${esc(b.cond)}</span>` : ''}</span>${node(b.node)}`;
+    const engine = S.factory['stage.sh'] || S.factory['context.md'];
+    if (!G.line.length && !G.around.length && !G.triggers.length && !engine) return '<div class="empty">Ingenting er bygget ennå. Stegene dukker opp her når du lager filene i <code>factory/</code>.</div>';
+    let h = '';
+    if (G.line.length) {
+      const orch = G.hasRun
+        ? `<button class="g-orch ${runOn ? 'on' : ''}" data-node="run.sh">run.sh kjører hele linja${runOn ? ` · <span data-since="${runOn.start}"></span>` : ''}</button>`
+        : '<span style="text-transform:none;letter-spacing:0;font:13px var(--display);color:var(--muted)">Du kjører stegene for hånd med stage.sh, i rekkefølgen tallene foran filene gir</span>';
+      const start = (G.triggers.length ? `<div class="g-col" style="gap:16px">${G.triggers.map(node).join('')}</div>${track}` : '')
+        + `<div class="g-col"><div class="g-node g-human"><span class="nm">Sak</span><span class="sb">0-ticket.md</span></div></div>`;
+      h += `<div class="g-label">Linja ${orch}</div>
+        <div class="g-lane">${start}${G.line.map(c => `${track}<div class="g-col">${node(c.node)}${c.branches.map(branch).join('')}</div>`).join('')}</div>`;
+    }
+    if (G.around.length) {
+      h += `<div class="g-label">Rundt linja</div><div class="g-lane loose">${G.around.map(n => {
+        const by = G.calledBy.get(n.id);
+        return `<div class="g-col">${node(n)}${by ? `<span class="sb" style="font:11px var(--mono);color:var(--muted);margin-top:6px">kjøres av ${by.map(esc).join(', ')}</span>` : ''}</div>`;
+      }).join('')}</div>`;
+    }
+    if (engine) {
+      const parts = [];
+      if (S.factory['stage.sh']) parts.push('① stage.sh gir alle stegene samme kontekst');
+      if (S.factory['context.md']) parts.push(`② ${lessons ? plural(lessons, 'lærdom', 'lærdommer') + ' i context.md så langt' : 'Hver kjøring kan gi lærdom til context.md'}`);
+      h += `<button class="g-hub" data-node="__engine"><span class="hl">Under alle stegene</span>${parts.map(p => `<span class="ht">${esc(p)}</span>`).join('')}</button>`;
+    }
+    h += `<div class="legend"><span><i class="swatch swatch--agent"></i>Agent</span><span><i class="swatch"></i>Tradisjonell kode</span><span><i class="swatch swatch--human"></i>Et menneske eller omverdenen</span></div>`;
+    return h;
+  });
+}
+
+function traceHtml(sess, events, live) {
+  if (!events?.length) return `<div class="empty" style="padding:10px">${live ? 'Venter på det første agenten gjør …' : 'Ingen verktøykall er registrert.'}</div>`;
+  const t0 = sess.start || events[0].t;
+  const rows = events.map((e, i) => {
+    const off = e.t && t0 ? '+' + fmtDur((e.t - t0) / 1000) : '';
+    if (e.kind === 'text') return `<div class="ev text"><span class="t">${off}</span><span class="i">💬</span><div class="what md">${md(e.text)}</div></div>`;
+    if (e.kind === 'thinking') return `<div class="ev thinking"><span class="t">${off}</span><span class="i">…</span><div class="what">${esc(e.text)}</div></div>`;
+    const pending = live && !e.done && e.out == null;
+    const diff = (e.old != null || e.new != null) ? diffHtml(e.old, e.new) : '';
+    return `<div class="ev ${e.error ? 'err' : ''} ${pending ? 'pending' : ''}"><span class="t">${off}</span><span class="i">${pending ? '◠' : e.error ? '✕' : toolIcon(e.name)}</span>
+      <div class="what"><span class="tool">${esc(toolName(e.name))}</span><span class="target">${esc(e.target || '')}</span>${e.desc ? ` <span class="desc">· ${esc(e.desc)}</span>` : ''}
+      ${diff}
+      ${e.out ? `<details data-k="o${i}-${esc(sess.id)}"><summary>utdata</summary><pre class="out">${esc(e.out)}</pre></details>` : ''}</div></div>`;
+  });
+  return rows.join('');
+}
+function diffHtml(a, b) {
+  const al = a == null ? [] : String(a).split('\n'), bl = b == null ? [] : String(b).split('\n');
+  // trim common prefix/suffix lines so the real change stands out
+  let p = 0; while (p < al.length && p < bl.length && al[p] === bl[p]) p++;
+  let s = 0; while (s < al.length - p && s < bl.length - p && al[al.length - 1 - s] === bl[bl.length - 1 - s]) s++;
+  const ctxA = al.slice(Math.max(0, p - 2), p), ctxB = al.slice(al.length - s, al.length - s + 2);
+  const lines = [
+    ...ctxA.map(l => `<div class="ctx">  ${esc(l)}</div>`),
+    ...al.slice(p, al.length - s).map(l => `<div class="del">- ${esc(l)}</div>`),
+    ...bl.slice(p, bl.length - s).map(l => `<div class="add">+ ${esc(l)}</div>`),
+    ...ctxB.map(l => `<div class="ctx">  ${esc(l)}</div>`),
+  ];
+  return `<div class="diff">${lines.join('')}</div>`;
+}
+function permHtml(tools, deny, extra = '') {
+  if (!tools?.length && !deny?.length) return '';
+  return `<div class="perm"><b>Tillatte verktøy</b>${(tools || []).map(t => `<span class="tag">${esc(t)}</span>`).join('')}
+    ${deny?.length ? `<br><b>Nektet</b>${deny.map(t => `<span class="tag deny">${esc(t)}</span>`).join('')}` : ''}${extra}</div>`;
+}
+
+function renderNow() {
+  const f = S.focus;
+  const act = S.active;
+  const live = f?.live;
+  const key = JSON.stringify([act.map(p => [p.pid, p.args, p.children.map(c => c.cmd), p.claude.length]), f?.id, f?.events?.length, f?.events?.at(-1)?.out?.length, f?.cost, f?.budget, f?.run]);
+  $('now-h').innerHTML = act.length ? 'Nå <span class="meta">kjører</span>' : 'Nå <span class="meta">ingenting kjører · viser den siste agentøkta</span>';
+  renderSection('now', key, () => {
+    let h = '';
+    if (act.length) {
+      const depth = (p) => { let d = 0, q = p; while (q?.parent && d < 6) { q = act.find(x => x.pid === q.parent); d++; } return d; };
+      const isTrigger = (p) => G.triggers.some(t => t.script === p.script);
+      h += '<div class="proc">' + act.map(p => {
+        const d = depth(p);
+        const kids = p.children.filter(c => !/^\S*(bash|sh|zsh)$/.test(c.cmd)).map(c => `<div class="proc-child" style="padding-left:${(d + 1) * 16}px">↳ ${esc(c.cmd)} · <span data-since="${c.start}"></span></div>`).join('');
+        const claude = p.claude.map(c => `<div style="padding-left:${(d + 1) * 16}px">${permHtml(c.tools, c.deny, c.budget ? `<br><b>Budsjett</b><span class="tag">maks $${esc(c.budget)}</span>` : '')}</div>`).join('');
+        const sleeping = isTrigger(p) && p.children.some(c => /^\S*sleep\b/.test(c.cmd));
+        return `<div class="proc-row" style="padding-left:${d * 16}px"><span class="dot on"></span><span class="script">${esc(p.script)}</span><span class="args">${esc(p.args.join(' '))}</span><span class="el" data-since="${p.start}"></span>${sleeping ? '<span class="args">· venter</span>' : ''}</div>${claude}${isTrigger(p) ? '' : kids}`;
+      }).join('') + '</div>';
+    }
+    if (!f) return h + `<div class="empty">Ingen agentøkter ennå. De dukker opp her når du kjører et steg med <code>factory/stage.sh</code>. Det levende sporet krever Claude Code.</div>`;
+    const stage = f.stage || f.stageWord || 'agent';
+    h += `<div class="now-head"><span class="title">${esc(stage)}${f.run ? ` <span style="color:var(--muted)">på</span> ${esc(f.run)}` : ''}</span>
+      <span class="sub">${live ? `<span class="chip running"><span class="ic">${ICON.running}</span>live</span> startet ${clock(f.start)}` : `ferdig ${ago(f.end)}`}${f.file && !live ? ` · skrev <code>runs/${esc(f.run)}/${esc(f.file)}</code>` : ''}</span></div>`;
+    if (!live && f.file) {
+      const run = S.runs.find(r => r.name === f.run), file = run?.files.find(x => x.name === f.file);
+      if (file) h += `<div style="margin-bottom:10px">${chip(verdict(file.content), '', `data-open="file" data-run="${esc(f.run)}" data-file="${esc(f.file)}"`)}</div>`;
+    }
+    h += `<div class="trace" data-scroll="now-trace" ${live ? 'data-stick' : ''}>${traceHtml(f, f.events, live)}</div>`;
+    h += `<div class="foot"><span>${plural(f.tools, 'verktøykall', 'verktøykall')}${f.errors ? ` · ${f.errors} stoppet eller feilet` : ''}</span>
+      ${f.cost ? `<span>${usd(f.cost.usd)} · ${fmtDur(f.cost.ms / 1000)}</span>` : f.budget ? `<span>${usd(f.budget.used)} av $${f.budget.cap} brukt så langt</span>` : ''}
+      ${f.cost && (f.cost.added || f.cost.removed) ? `<span>+${f.cost.added} −${f.cost.removed} linjer</span>` : ''}
+      ${f.model ? `<span>${esc(f.model)}</span>` : ''}
+      <button class="icon-btn" data-open="session" data-id="${esc(f.id)}" style="margin-left:auto">Hele sporet</button></div>`;
+    return h;
+  });
+}
+
+// Columns of the runs table: every file the runs contain, in the order of the station that wrote it.
+function runColumns() {
+  const names = new Set();
+  for (const r of S.runs) for (const f of r.files) if (!/(^|\/)0-[\w-]+\.md$/.test(f.name)) names.add(f.name);
+  const pos = (file) => {
+    const base = file.replace(/^.*\//, '');
+    const i = G.order.findIndex(n => n.writes.includes(file) || n.writes.includes(base));
+    return i < 0 ? 1000 + numOf(base) : i;
+  };
+  return [...names].sort((a, b) => pos(a) - pos(b) || a.localeCompare(b)).map(f => ({ file: f, label: nice(f.replace(/^.*\//, '')) }));
+}
+const logSec = (run, file) => { const stage = file.replace(/^.*\//, '').replace(/\.md$/, ''); let v = null; for (const e of S.log) if (normRun(e.run).split('/')[0] === run && e.stage === stage && typeof e.sec === 'number') v = e.sec; return v; };
+
+function renderRuns() {
+  const cells = activeCells();
+  const runs = [...S.runs].reverse();
+  const cols = runColumns();
+  for (const k of cells.keys()) { const file = k.split('|')[1]; if (!cols.some(c => c.file === file)) cols.push({ file, label: nice(file.replace(/^.*\//, '')) }); }
+  $('runs-meta').textContent = `${plural(S.runs.length, 'mappe', 'mapper')} i runs/ · klikk på et resultat for å se svaret og hva agenten gjorde`;
+  const key = JSON.stringify([S.runs.map(r => [r.name, r.files.map(f => [f.name, f.mtime])]), [...cells.keys()], S.log.length, S.sessions.length, cols.map(c => c.file)]);
+  renderSection('runs', key, () => {
+    if (!runs.length) return '<div class="empty">Ingen kjøringer ennå.</div>';
+    const head = `<tr><th>Kjøring</th>${cols.map(c => `<th title="${esc(c.file)}">${esc(c.label)}</th>`).join('')}</tr>`;
+    const rows = runs.map(r => {
+      const ticket = r.files.find(f => f.name === '0-ticket.md');
+      const title = ticket ? (ticket.content.match(/^#\s+(.+)$/m)?.[1] || firstLine(ticket.content.replace(/^---[\s\S]*?---\n/, ''))) : '';
+      const liveRow = [...cells.keys()].some(k => k.startsWith(r.name + '|'));
+      const tds = cols.map(c => {
+        const p = cells.get(r.name + '|' + c.file);
+        if (p) return `<td><span class="chip running"><span class="ic">${ICON.running}</span>kjører <span class="sec" data-since="${p.start}"></span></span></td>`;
+        const f = r.files.find(x => x.name === c.file);
+        if (!f) return `<td><span class="dash">–</span></td>`;
+        const sec = logSec(r.name, f.name);
+        return `<td>${chip(verdict(f.content), sec != null ? ` <span class="sec">${fmtDur(sec)}</span>` : '', `data-open="file" data-run="${esc(r.name)}" data-file="${esc(f.name)}" title="${esc(firstLine(f.content))}"`)}</td>`;
+      }).join('');
+      return `<tr class="${liveRow ? 'is-live' : ''}"><td><button class="run-name" data-open="file" data-run="${esc(r.name)}" data-file="0-ticket.md">
+          <span class="rn">${esc(r.name)}</span><span class="tt" title="${esc(title)}">${esc(title || '—')}</span><span class="age">${ago(r.updated || r.created)}</span></button></td>${tds}</tr>`;
+    }).join('');
+    const loose = S.loose.length ? `<div class="subhead">Saker hentet fra issues</div><ul class="list">${S.loose.map(l => `<li><span class="n">${esc(l.name)}</span><span class="tx">${esc(l.content?.match(/^#\s+(.+)$/m)?.[1] || firstLine(l.content))}</span><span class="r" style="color:var(--muted);font-size:12px">${ago(l.mtime)}</span></li>`).join('')}</ul>` : '';
+    return `<div class="table-wrap"><table class="runs" style="min-width:${260 + cols.length * 100}px"><thead>${head}</thead><tbody>${rows}</tbody></table></div>${loose}`;
+  });
+}
+
+function lessonsOf(c) {
+  const parts = (c || '').split(/^##\s+Lessons\s*$/m);
+  return (parts[1] || '').split('\n').filter(l => /^\s*[-*]\s+/.test(l)).map(l => l.replace(/^\s*[-*]\s+/, ''));
+}
+function renderLessons() {
+  const c = S.factory['context.md']?.content;
+  renderSection('lessons', JSON.stringify(c), () => {
+    if (c == null) return '<div class="empty"><code>factory/context.md</code> finnes ikke ennå.</div>';
+    const lessons = lessonsOf(c);
+    const fresh = seenLessons ? lessons.filter(l => !seenLessons.has(l)) : [];
+    seenLessons = new Set(lessons);
+    return `${lessons.length ? `<ol class="lessons">${lessons.map(l => `<li class="${fresh.includes(l) ? 'fresh' : ''}">${inline(l)}</li>`).join('')}</ol>` : '<div class="empty">Ingen lærdommer ennå. Når et steg skriver en linje som begynner med <code>LESSON:</code>, legger stage.sh den til her, og alle stegene etterpå leser den.</div>'}
+      <details class="fold" data-k="ctx"><summary>Konteksten alle stegene leser</summary><div class="md" style="margin-top:6px">${md(c.split(/^##\s+Lessons\s*$/m)[0])}</div></details>`;
+  });
+}
+
+function renderGit() {
+  const g = S.git;
+  renderSection('git', JSON.stringify(g), () => {
+    if (!g?.ok) return '<div class="empty">Fant ikke et git-repo.</div>';
+    const src = g.changes.filter(c => c.file.startsWith('src/'));
+    const rest = g.changes.filter(c => !c.file.startsWith('src/'));
+    const grp = (list) => {
+      // collapse untracked folders like factory/ into one line + count
+      const out = [], byDir = {};
+      for (const c of list) { if (c.code === '??' && c.file.includes('/')) { const d = c.file.split('/')[0] + '/'; (byDir[d] ||= []).push(c); } else out.push(c); }
+      for (const [d, l] of Object.entries(byDir)) out.push({ code: '??', file: `${d}  (${plural(l.length, 'ny fil', 'nye filer')})` });
+      return out;
+    };
+    const fileList = (list) => `<ul class="files">${grp(list).map(c => `<li><span class="code ${esc(c.code.trim()[0] || '')}">${esc(c.code)}</span><span class="f">${esc(c.file)}</span></li>`).join('')}</ul>`;
+    return `<dl class="kv"><dt>Branch</dt><dd class="mono">${esc(g.branch)}</dd>
+        <dt>Siste commit</dt><dd>${g.commits[0] ? `<span class="mono">${esc(g.commits[0].hash)}</span> ${esc(g.commits[0].subject)} <span style="color:var(--muted)">· ${ago(g.commits[0].time)}</span>` : '–'}</dd></dl>
+      <div class="subhead">Det agentene har endret i src/</div>
+      ${src.length ? fileList(src) : '<div class="empty">Ingen endringer i src/ som ikke er committet.</div>'}
+      ${g.diff ? `<details class="fold" data-k="srcdiff" open><summary>Diffen i src/</summary>${unifiedDiff(g.diff)}</details>` : ''}
+      ${rest.length ? `<div class="subhead">Andre steder</div>${fileList(rest)}` : ''}
+      ${g.stashes.length ? `<div class="subhead">Stash</div><ul class="files">${g.stashes.map(s => `<li><span class="f">${esc(s)}</span></li>`).join('')}</ul>` : ''}
+      ${g.branches.length ? `<div class="subhead">factory/*-brancher</div><ul class="files">${g.branches.map(b => `<li><span class="f">${esc(b)}</span></li>`).join('')}</ul>` : ''}
+      <details class="fold" data-k="commits"><summary>Siste commits</summary><ul class="list" style="margin-top:4px">${g.commits.map(c => `<li><span class="n">${esc(c.hash)}</span><span class="tx">${esc(c.subject)}</span><span class="r" style="color:var(--muted);font-size:12px">${ago(c.time)}</span></li>`).join('')}</ul></details>`;
+  });
+}
+function unifiedDiff(d) {
+  return `<div class="diff" style="margin-top:6px">${d.split('\n').filter(l => !/^(diff --git|index |--- |\+\+\+ )/.test(l)).map(l =>
+    `<div class="${l.startsWith('@@') ? 'hunk' : l.startsWith('+') ? 'add' : l.startsWith('-') ? 'del' : 'ctx'}">${esc(l)}</div>`).join('')}</div>`;
+}
+
+function renderGitHub() {
+  const g = S.gh;
+  $('gh-meta').textContent = g?.fetchedAt ? `via gh · oppdatert ${ago(g.fetchedAt)}` : '';
+  renderSection('gh', JSON.stringify(g && { ...g, fetchedAt: 0 }), () => {
+    if (g?.disabled) return '<div class="empty">Skrudd av med NO_GH=1.</div>';
+    if (g?.loading) return '<div class="empty">Henter fra gh …</div>';
+    if (g?.error) return '<div class="empty">Fikk ikke kontakt med GitHub via <code>gh</code>.</div>';
+    const st = (s, conc) => {
+      const x = (conc || s || '').toLowerCase();
+      if (/merged/.test(x)) return { label: 'merget', tone: 'good' };
+      if (/success/.test(x)) return { label: 'grønn', tone: 'good' };
+      if (/fail|cancel|timed_out/.test(x)) return { label: x, tone: 'critical' };
+      if (/in_progress|queued|pending|waiting/.test(x)) return { label: x.replace('_', ' '), tone: 'running' };
+      if (/closed/.test(x)) return { label: 'lukket', tone: 'neutral' };
+      if (/open/.test(x)) return { label: 'åpen', tone: 'warn' };
+      return { label: x || '?', tone: 'neutral' };
+    };
+    const issues = g.issues || [], prs = g.prs || [], runs = g.runs || [];
+    return `<div class="subhead" style="margin-top:0">Issues</div>
+      ${issues.length ? `<ul class="list">${issues.slice(0, 10).map(i => `<li><span class="n">#${i.number}</span><span class="tx"><a href="${esc(i.url)}" target="_blank" rel="noopener noreferrer">${esc(i.title)}</a></span><span class="r">${(i.labels || []).some(l => l.name === 'factory') ? '<span class="tag">factory</span>' : ''}${chip(st(i.state))}</span></li>`).join('')}</ul>` : '<div class="empty">Ingen issues ennå.</div>'}
+      <div class="subhead">Pull requests</div>
+      ${prs.length ? `<ul class="list">${prs.slice(0, 8).map(p => `<li><span class="n">#${p.number}</span><span class="tx"><a href="${esc(p.url)}" target="_blank" rel="noopener noreferrer">${esc(p.title)}</a></span><span class="r">${chip(st(p.state))}</span></li>`).join('')}</ul>` : '<div class="empty">Ingen pull requests ennå.</div>'}
+      <div class="subhead">CI</div>
+      ${runs.length ? `<ul class="list">${runs.slice(0, 6).map(r => `<li><span class="tx"><a href="${esc(r.url)}" target="_blank" rel="noopener noreferrer">${esc(r.workflowName)}</a> <span style="color:var(--muted)">· ${esc(r.headBranch)}</span></span><span class="r">${chip(st(r.status === 'completed' ? '' : r.status, r.conclusion))}</span></li>`).join('')}</ul>` : '<div class="empty">Ingen CI-kjøringer ennå.</div>'}`;
+  });
+}
+
+function renderStats() {
+  const key = JSON.stringify([S.log, S.sessions.map(s => [s.id, s.cost?.usd]), S.runs.map(r => r.files.map(f => f.name + firstLine(f.content))), G.order.map(n => n.id)]);
+  renderSection('stats', key, () => {
+    const timed = S.log.filter(e => typeof e.sec === 'number' && e.stage);
+    const totalSec = timed.reduce((a, e) => a + e.sec, 0);
+    const cost = S.sessions.reduce((a, s) => a + (s.cost?.usd || 0), 0);
+    const ends = S.runs.flatMap(r => r.files).map(f => verdict(f.content).label).filter(l => ['shippet', 'stoppet', 'feil på main'].includes(l));
+    const shipped = ends.filter(x => x === 'shippet').length;
+    const blocked = S.sessions.reduce((a, s) => a + (s.errors || 0), 0);
+    const tiles = [
+      [S.runs.length, 'mapper i runs/'],
+      [S.sessions.length, 'agentøkter'],
+      [fmtDur(totalSec), 'agenttid i log.jsonl'],
+      [usd(cost), 'kostnad (API-pris)'],
+      [blocked, 'verktøykall stoppet eller feilet'],
+    ];
+    if (ends.length) tiles.push([`${shipped} / ${ends.length - shipped}`, 'shippet / stoppet']);
+    // seconds per stage, average over log.jsonl, in the order of the line
+    const by = {};
+    for (const e of timed) (by[e.stage] ||= []).push(e.sec);
+    const pos = (s) => { const i = G.order.findIndex(n => n.prompts.includes(s) || n.writes.includes(s + '.md')); return i < 0 ? 1000 + numOf(s) : i; };
+    const stages = Object.keys(by).sort((a, b) => pos(a) - pos(b) || a.localeCompare(b));
+    const max = Math.max(1, ...stages.map(s => by[s].reduce((a, b) => a + b, 0) / by[s].length));
+    const bars = stages.map(s => {
+      const v = by[s], avg = v.reduce((a, b) => a + b, 0) / v.length, pct = (avg / max) * 78;
+      return `<div class="row" data-tip="${esc(`${s}: snitt ${fmtDur(avg)} · min ${fmtDur(Math.min(...v))} · maks ${fmtDur(Math.max(...v))} · ${plural(v.length, 'kjøring', 'kjøringer')}`)}">
+        <span class="bl">${esc(s)}</span><span class="track"><span class="bar" style="width:${pct}%"></span><span class="bv" style="left:calc(${pct}% + 6px)">${fmtDur(avg)} · n=${v.length}</span></span></div>`;
+    }).join('');
+    const logRows = [...S.log].reverse().slice(0, 40).map(e => {
+      const { _i, run, stage, sec, raw, ...rest } = e;
+      return `<tr><td class="num">${_i + 1}</td><td>${esc(run ? normRun(run) : '')}</td><td>${esc(stage || '')}</td><td class="num">${sec != null ? esc(sec) + ' s' : ''}</td><td>${esc(raw || (Object.keys(rest).length ? JSON.stringify(rest) : ''))}</td></tr>`;
+    }).join('');
+    return `<div class="tiles">${tiles.map(([v, l]) => `<div class="tile"><div class="v">${esc(v)}</div><div class="l">${esc(l)}</div></div>`).join('')}</div>
+      <div class="grid-2" style="gap:24px">
+        <div><div class="subhead" style="margin-top:0">Snittid per steg</div>${stages.length ? `<div class="bars">${bars}</div>` : '<div class="empty">Ingen tider ennå.</div>'}</div>
+        <div><div class="subhead" style="margin-top:0">runs/log.jsonl, nyeste først</div>${S.log.length ? `<div style="max-height:260px;overflow:auto" data-scroll="log"><table class="log-table"><thead><tr><th>#</th><th>kjøring</th><th>steg</th><th>tid</th><th>annet</th></tr></thead><tbody>${logRows}</tbody></table></div>` : '<div class="empty">Tom.</div>'}</div>
+      </div>`;
+  });
+}
+
+function render() {
+  G = buildGraph(S.factory);
+  renderHeader(); renderPipeline(); renderNow(); renderRuns(); renderLessons(); renderGit(); renderGitHub(); renderStats();
+  if (drawerCtx?.liveRefresh) drawerCtx.liveRefresh();
+  tick();
+}
+
+function tick() {
+  document.querySelectorAll('[data-since]').forEach(el => { el.textContent = fmtDur((Date.now() - +el.dataset.since) / 1000); });
+  const p = $('polled'); if (p && S) p.textContent = ago(S.now);
+}
+
+// ---------------------------------------------------------------- drawer
+function openDrawer(title, sub, html) {
+  $('d-title').textContent = title; $('d-sub').innerHTML = sub || ''; $('d-body').innerHTML = html;
+  $('drawer').classList.add('open'); $('drawer').setAttribute('aria-hidden', 'false'); $('scrim').classList.add('open');
+  $('d-body').scrollTop = 0;
+}
+function closeDrawer() { $('drawer').classList.remove('open'); $('drawer').setAttribute('aria-hidden', 'true'); $('scrim').classList.remove('open'); drawerCtx = null; }
+
+async function loadSession(id) {
+  const r = await fetch('/api/session?id=' + encodeURIComponent(id));
+  return r.ok ? r.json() : null;
+}
+
+async function openFile(runName, fileName) {
+  const run = S.runs.find(r => r.name === runName);
+  const f = run?.files.find(x => x.name === fileName);
+  if (!f) return;
+  const stage = fileName.replace(/^.*\//, '').replace(/\.md$/, '');
+  const sess = sessionFor(runName, fileName);
+  const sec = logSec(runName, fileName);
+  const isTicket = /(^|\/)0-[\w-]+\.md$/.test(fileName);
+  const sub = `<code>runs/${esc(runName)}/${esc(fileName)}</code> · skrevet ${ago(f.mtime)}${sec != null ? ` · ${fmtDur(sec)}` : ''}${sess?.cost ? ` · ${usd(sess.cost.usd)}` : ''}`;
+  let html = isTicket ? '' : `<div style="margin-bottom:10px">${chip(verdict(f.content))}</div>`;
+  html += `<div class="box md">${md(f.content)}</div>`;
+  const tools = S.stageTools[stage] || (sess ? S.stageTools['*'] : null);
+  if (tools && sess) html += permHtml(tools.tools, tools.deny);
+  if (sess) html += `<div class="subhead">Det agenten gjorde</div><div id="d-trace" class="trace"><div class="empty" style="padding:10px">Henter sporet …</div></div>`;
+  else if (!isTicket) html += `<div class="empty">Fant ikke noe agentspor for denne filen. Den er skrevet av et skript, steget har kjørt på nytt senere, eller agenten er ikke Claude Code.</div>`;
+  openDrawer(isTicket ? (f.content.match(/^#\s+(.+)$/m)?.[1] || 'Sak') : `${nice(stage)} · ${runName}`, sub, html);
+  drawerCtx = { type: 'file' };
+  if (sess) { const full = await loadSession(sess.id); if (full && $('d-trace')) $('d-trace').innerHTML = traceHtml(full, full.events, false); }
+}
+
+async function openSession(id) {
+  const s = S.sessions.find(x => x.id === id);
+  const full = await loadSession(id);
+  if (!full) return;
+  const draw = (full) => `${s?.file ? `<div style="margin-bottom:10px">skrev <code>runs/${esc(s.run)}/${esc(s.file)}</code></div>` : ''}
+    <details class="fold" data-k="prompt"><summary>Prompten den fikk (før context.md og &lt;input&gt;)</summary><pre class="src" style="white-space:pre-wrap;margin-top:6px">${esc(full.promptHead)}</pre></details>
+    <div class="subhead">Sporet</div><div class="trace">${traceHtml(full, full.events, s?.live)}</div>`;
+  openDrawer(`${s?.stage || full.stageWord || 'agent'}${s?.run ? ' · ' + s.run : ''}`, `økt ${esc(id.slice(0, 8))} · ${clock(full.start)} · ${full.cost ? usd(full.cost.usd) + ' · ' + fmtDur(full.cost.ms / 1000) : 'kjører'}`, draw(full));
+  let seen = full.events.length;
+  drawerCtx = { type: 'session', id, liveRefresh: s?.live ? async () => { const f2 = await loadSession(id); if (f2 && drawerCtx?.id === id && f2.events.length !== seen) { seen = f2.events.length; const b = $('d-body'); const atEnd = b.scrollHeight - b.scrollTop - b.clientHeight < 40; b.innerHTML = draw(f2); if (atEnd) b.scrollTop = b.scrollHeight; } } : null };
+}
+
+const srcBlock = (fname) => { const f = S.factory[fname]; return `<div class="subhead">factory/${esc(fname)}</div>` + (f ? `<pre class="src">${esc(f.content)}</pre>` : `<div class="empty">Finnes ikke.</div>`); };
+
+function openNode(id) {
+  if (id === '__engine') {
+    openDrawer('Under alle stegene', 'motoren og den felles konteksten', ['stage.sh', 'context.md'].filter(f => S.factory[f]).map(srcBlock).join(''));
+    drawerCtx = { type: 'node', id };
+    return;
+  }
+  if (id === 'run.sh') {
+    openDrawer('run.sh', 'kjører hele linja', srcBlock('run.sh'));
+    drawerCtx = { type: 'node', id };
+    return;
+  }
+  const n = G.nodes.get(id);
+  if (!n) return;
+  const by = G.calledBy.get(n.id);
+  const calls = n.script ? G.callsOf(n.script).map(c => G.nodeOf(c.ref)).filter(x => x && x.id !== n.id).map(x => x.label) : [];
+  let html = '';
+  if (by || calls.length) html += `<p style="margin-top:0">${by ? `Kjøres av ${by.map(b => `<code>${esc(b)}</code>`).join(', ')}.` : ''} ${calls.length ? `Kjører ${calls.map(esc).join(', ')}.` : ''}</p>`;
+  for (const p of n.prompts) {
+    const t = S.stageTools[p] || S.stageTools['*'];
+    if (t) html += permHtml(t.tools, t.deny, t.mcp ? `<br><b>MCP</b><span class="tag">${esc(t.mcp)}</span>` : '');
+  }
+  html += n.files.map(srcBlock).join('');
+  const recent = S.sessions.filter(s => n.prompts.includes(s.stage)).slice(-8).reverse();
+  if (recent.length) html += `<div class="subhead">Siste økter</div><ul class="list">${recent.map(s => `<li><span class="n">${clock(s.start)}</span><span class="tx">${esc(s.run || '?')} · ${esc(s.finalFirst)}</span><span class="r"><button class="icon-btn" data-open="session" data-id="${esc(s.id)}">spor</button></span></li>`).join('')}</ul>`;
+  openDrawer(n.label, n.kind === 'agent' ? (n.script ? `agent, startet av ${n.script}` : 'agent') : 'tradisjonell kode, ingen agent', html);
+  drawerCtx = { type: 'node', id };
+}
+
+document.addEventListener('click', (e) => {
+  const t = e.target.closest('[data-open],[data-node]');
+  if (!t || !S) return;
+  if (t.dataset.node) return openNode(t.dataset.node);
+  if (t.dataset.open === 'file') return openFile(t.dataset.run, t.dataset.file);
+  if (t.dataset.open === 'session') return openSession(t.dataset.id);
+});
+$('d-close').onclick = closeDrawer; $('scrim').onclick = closeDrawer;
+document.addEventListener('keydown', (e) => { if (e.key === 'Escape') closeDrawer(); });
+
+// tooltip for the bar chart
+document.addEventListener('mousemove', (e) => {
+  const row = e.target.closest('[data-tip]'); const tip = $('tip');
+  if (!row) { tip.style.display = 'none'; return; }
+  tip.textContent = row.dataset.tip; tip.style.display = 'block';
+  tip.style.left = Math.min(e.clientX + 12, innerWidth - tip.offsetWidth - 8) + 'px'; tip.style.top = (e.clientY + 14) + 'px';
+});
+
+// ---------------------------------------------------------------- polling
+async function poll() {
+  try {
+    const r = await fetch('/api/state', { cache: 'no-store' });
+    if (!r.ok) throw new Error((await r.json().catch(() => ({}))).error || r.status);
+    S = await r.json();
+    $('err').style.display = 'none';
+    render();
+  } catch (err) {
+    $('err').style.display = 'block';
+    $('err').textContent = 'Mistet kontakten med monitoren (' + err.message + '). Kjører node monitor/server.mjs fortsatt?';
+  }
+  setTimeout(poll, S?.active?.length ? 1000 : 2000);
+}
+setInterval(tick, 1000);
+poll();
+</script>
+</body>
+</html>

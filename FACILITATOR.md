@@ -14,7 +14,7 @@
    gh issue create --label factory --title "For mange av samme rett" --body-file backlog/09-maks-antall.md
    ```
    Sak 09 skal stoppe med et utkast til en spec i issuen. Lim utkastet inn i beskrivelsen og sett på labelen igjen. Da skal triage si `automatable`. Stopp så `watch.sh`, og kjør `factory/learn.sh && git diff factory` for å se at læresteget finner issuen.
-   Kjør den én gang til med `cp ../software-factory-ws/solution/copilot/stage.sh factory/` for å teste Copilot-varianten, og med `solution/codex/stage.sh` for Codex.
+   Kjør den én gang til med `cp ../software-factory-ws/solution/copilot/stage.sh factory/` for å teste Copilot-varianten. Codex har en egen testkjøring lenger ned.
 
    Sjekk særlig at knappen «Meld fra om en feil» setter labelen `factory`. Det er ikke testet mot ekte GitHub ennå. Kjør også steg 0.7 én gang, og se at deployen til Pages går gjennom når variabelen `PAGES` er satt.
 
@@ -31,13 +31,33 @@
 
 ## Codex CLI er bare testet med en stub
 
-`solution/codex/stage.sh` følger OpenAI-dokumentasjonen for `codex exec`, men er ikke kjørt mot ekte Codex. Codex har ingen verktøyliste per fil. Skriptet bruker `--sandbox read-only` for stegene som bare leser, og setter tilbake filene i `keep` hvis et steg endret dem. Sjekk dette i testkjøringen:
+`solution/codex/stage.sh` følger OpenAI-dokumentasjonen for `codex exec`, men er ikke kjørt mot ekte Codex. Codex har ingen verktøyliste per fil. Skriptet bruker `--sandbox read-only` for stegene som bare leser, og setter tilbake filene i `keep` hvis et steg endret dem.
 
-- At `-c 'mcp_servers.playwright={…}'` godtar en inline-tabell, og at Playwright MCP får skrive `.playwright-mcp/` når sandkassen er `read-only`.
-- At `gh issue list` virker i `6-monitor` med `sandbox_workspace_write.network_access=true`. På macOS kan sandkassen stenge for tokenet til `gh` i nøkkelringen.
-- At `npm test` og `git diff` kjører i `read-only`-sandkassen.
-- At build ikke stopper på regelen i `AGENTS.md` om å skrive en test først. Codex får skrive testen, og `stage.sh` setter den tilbake etterpå.
-- Deny-lista i `.claude/settings.json` gjelder ikke Codex heller.
+### Testkjøring for Codex
+
+Bruk et eget repo, så `factory/` er committet med Codex-varianten fra start. Ellers nekter `learn.sh` å kjøre fordi `factory/stage.sh` er endret.
+
+```bash
+gh repo create woltora-codex --private --clone --template chrhein/software-factory-ws && cd woltora-codex && npm ci && mkdir -p runs
+gh label create factory
+cp -r ../software-factory-ws/solution/factory . && cp ../software-factory-ws/solution/codex/stage.sh factory/
+git add factory && git commit -m "factory med Codex" && git push
+echo "Svar med ett ord: klar" | codex exec -                    # oppgave 0.2
+factory/run.sh backlog/03-sok-skiller-store-sma.md 2>&1 | tee runs/codex.log   # hele veien til main
+factory/judge.sh "$(ls -d runs/03-* | tail -1)"                 # dommeren, så læresteget har noe å lære av
+mkdir -p runs/m && factory/stage.sh 6-monitor runs/m            # trenger nettverk for gh
+factory/learn.sh && git diff factory
+```
+
+Sjekk dette underveis:
+
+- At oppgave 0.2 svarer `klar`. Klager `codex exec` på at mappen ikke er godkjent, må deltakerne kjøre `codex` én gang i repoet.
+- At `runs/03-*/check/5-check.md` begynner med `CHECK: pass`, og at agenten faktisk har klikket i appen. Mangler nettleseren, godtar ikke Codex inline-tabellen i `-c 'mcp_servers.playwright={…}'`, eller så stopper `read-only`-sandkassen Playwright MCP fra å skrive `.playwright-mcp/`.
+- At `runs/03-*/4-review.md` viser til diffen og testresultatet. Hvis ikke, kjører ikke `npm test` og `git diff` i `read-only`-sandkassen.
+- Om `runs/codex.log` inneholder `3-build endret låste filer`. Da prøvde build å skrive en test fordi `AGENTS.md` sier det. Det er greit så lenge verify går gjennom, men skjer det hver gang, bør `3-build.md` si tydeligere at testen allerede finnes.
+- At `runs/m/6-monitor.md` beskriver en feil som ikke står i `gh issue list`. Sier agenten at `gh` feilet, stenger sandkassen på macOS for nettverket eller for tokenet til `gh` i nøkkelringen. Da må `6-monitor` få `--sandbox danger-full-access`, eller så må `stage.sh` legge issue-lista i input.
+- At `git diff factory` etter `learn.sh` bare endrer `factory/[1-6]-*.md` og `factory/context.md`.
+- Deny-lista i `.claude/settings.json` gjelder ikke Codex heller. Codex-agentene kan lese `workshop.html` og `solution/`.
 
 ## Slik gikk en testkjøring (5. november 2026, Opus)
 

@@ -4,6 +4,7 @@
 set -Eeuo pipefail
 ticket=$1
 git diff --quiet -- src || { echo "src/ har endringer som ikke er committet. Kast dem med: git restore src"; exit 1; }
+git pull -q --no-rebase --ff-only
 run=runs/$(basename "$ticket" .md)-$(date +%H%M%S)
 mkdir -p "$run"; cp "$ticket" "$run/0-ticket.md"
 step() { echo; echo "── $1"; factory/stage.sh "$1" "$run"; }

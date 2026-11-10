@@ -16,7 +16,7 @@ pr=$({ cat "$run/4-review.md"; [ -z "$issue" ] || printf '\nFixes #%s\n' "$issue
 git switch -q main
 echo "CI kjører på $pr"
 ci "$sha" || { end ci "STOPPET: CI feilet på $pr"; exit 0; }
-gh pr merge "$pr" --squash --delete-branch && git pull -q
+gh pr merge "$pr" --squash --delete-branch && git pull -q --no-rebase --ff-only
 echo "Merget. Sjekker main …"
 factory/check.sh "$run"
 if head -1 "$run/check/5-check.md" | grep -q pass; then end ship "SHIPPET: $pr er merget til main, og sjekken etterpå gikk gjennom."

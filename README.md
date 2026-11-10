@@ -2,7 +2,7 @@
 
 En workshop på to timer for faggruppen AI-superbrukerne. Den bygger på Warp-artikkelen [«What is a software factory?»](https://www.warp.dev/articles/what-is-a-software-factory) og på hvordan [StrongDM shipper uten å lese koden](https://simonwillison.net/2026/feb/7/software-factory/).
 
-Du bygger en loop som tar en feilmelding fra Woltora (demoappen fra workshopen om triggede agenter) helt ut i produksjon uten at noen leser koden. Underveis prøver du å lure hvert steg, så du vet hva du kan stole på.
+Du bygger en loop som tar en feilmelding fra matbestillingsappen Woltora helt ut i produksjon uten at noen leser koden. Underveis prøver du å lure hvert steg, så du vet hva du kan stole på.
 
 ```
 issue med label factory ─→ triage ─→ test ─→ build ─→ review ─→ verify ─→ ship.sh: PR, CI, merge til main, sjekk etterpå
@@ -33,7 +33,7 @@ issue med label factory ─→ triage ─→ test ─→ build ─→ review ─
 | `workshop.html` | Lysbildene, med alle filene som heredocs du kan kopiere |
 | `bilder/` | Skjermbildene av Woltora og build.warp.dev som lysbildene bruker |
 | `backlog/` | Feilrapporter fra brukere |
-| `.github/workflows/ci.yml` | Tester hver pull request og hver push til `main`. Deployer `main` til GitHub Pages hvis du har skrudd det på (frivillig, oppgave 0.6) |
+| `.github/workflows/ci.yml` | Tester hver pull request og hver push til `main`. Deployer `main` til GitHub Pages hvis du har skrudd det på (frivillig, oppgave 0.7) |
 | `.claude/settings.json` | Skjuler lysbildene, fasiten og fasilitatorguiden for Claude Code, så agentene ikke ser svarene |
 | `src/` | Woltora. `npm test`, `npm run build`, `npm run dev` |
 

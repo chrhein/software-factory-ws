@@ -420,7 +420,7 @@
       <h2 class="r" style="--i:1">Innhold i workshopen</h2>
       <table class="r" style="--i:2">
         <tbody>
-          <tr><td>Oppsett</td><td>Et eget repo der <code>main</code> er produksjon. GitHub Pages er frivillig.</td></tr>
+          <tr><td>Oppsett</td><td>Et eget repo der <code>main</code> er produksjon.</td></tr>
           <tr><td>Deloppgaver</td><td>En motor som gir alle stegene samme kontekst og logger hver kjøring, og stegene som skriver testen, fikser feilen og stopper dårlige endringer. Du prøver å lure dem underveis.</td></tr>
           <tr><td>Fiks og ship med øynene lukket</td><td>Du sender inn en feilmelding fra appen. Fabrikken fikser feilen, merger fiksen til <code>main</code> og sjekker den etterpå, uten at noen har lest koden. Til slutt prøver du å lure hele fabrikken og ser hvilke sperrer som stoppet deg.</td></tr>
         </tbody>
@@ -472,13 +472,11 @@
 
   <section class="slide" data-part="Del 2 · Bygg din egen fabrikk">
     <div class="slide-inner">
-      <div class="kicker r" style="--i:0">Oppgave 0 · Produksjon</div>
-      <h2 class="r" style="--i:1"><code>main</code> er produksjon</h2>
+      <div class="kicker r" style="--i:0">Oppgave 0 · Label</div>
+      <h2 class="r" style="--i:1">Én label setter fabrikken i gang</h2>
       <div class="steps">
         <div class="step r" style="--i:2"><div class="step-num">0.6</div><div><p class="step-text">Lag labelen fabrikken lytter på</p>
           <div class="cmd"><span class="cmd-where">Terminal</span><pre>gh label create factory</pre><button class="copy" data-copy>Kopier</button></div></div></div>
-        <div class="step r" style="--i:3"><div class="step-num">0.7</div><div><p class="step-text"><strong>Frivillig:</strong> Skru på GitHub Pages hvis du vil se appen live. CI deployer <code>main</code> dit etter hver merge.</p>
-          <div class="cmd"><span class="cmd-where">Terminal</span><pre>gh api -X POST "repos/{owner}/{repo}/pages" -f build_type=workflow &gt;/dev/null &amp;&amp; gh variable set PAGES --body true &amp;&amp; gh workflow run ci.yml</pre><button class="copy" data-copy>Kopier</button></div></div></div>
       </div>
     </div>
   </section>
@@ -488,7 +486,7 @@
       <div class="kicker r" style="--i:0">Oppgave 0 · Monitor</div>
       <h2 class="r" style="--i:1">Følg med på fabrikken mens du bygger den</h2>
       <div class="steps">
-        <div class="step r" style="--i:2"><div class="step-num">0.8</div><div><p class="step-text">Start monitoren i en egen fane og åpne <code>http://localhost:4777</code>. La den gå resten av workshopen. Grafen viser hvert steg du lager i <code>factory/</code> og lyser opp steget som kjører.</p>
+        <div class="step r" style="--i:2"><div class="step-num">0.7</div><div><p class="step-text">Start monitoren i en egen fane og åpne <code>http://localhost:4777</code>. La den gå resten av workshopen. Grafen viser hvert steg du lager i <code>factory/</code> og lyser opp steget som kjører.</p>
           <div class="cmd"><span class="cmd-where">Terminal</span><pre>node monitor/server.mjs</pre><button class="copy" data-copy>Kopier</button></div></div></div>
       </div>
     </div>
@@ -948,7 +946,7 @@ EOF</pre><button class="copy" data-copy>Kopier</button></div></div></div>
       <div class="steps">
         <div class="step r" style="--i:2"><div class="step-num">8.2</div><div><p class="step-text">Ship <code>t1</code> uten å lese diffen. Følg med i terminalen og på GitHub. Det tar to til tre minutter.</p>
           <div class="cmd"><span class="cmd-where">Terminal</span><pre>factory/ship.sh runs/t1</pre><button class="copy" data-copy>Kopier</button></div></div></div>
-        <div class="step r" style="--i:3"><div class="step-num">8.3</div><div><p class="step-text">Start appen fra <code>main</code>, og se selv at feilen er borte. La den gå i en egen fane resten av workshopen. <small>(Har du skrudd på Pages, kan du åpne adressen derfra i stedet.)</small></p>
+        <div class="step r" style="--i:3"><div class="step-num">8.3</div><div><p class="step-text">Start appen fra <code>main</code>, og se selv at feilen er borte. La den gå i en egen fane resten av workshopen.</p>
           <div class="cmd"><span class="cmd-where">Terminal</span><pre>npm run dev -- --open</pre><button class="copy" data-copy>Kopier</button></div></div></div>
       </div>
       <p class="note r" style="--i:4"><strong>Hvorfor:</strong> ingen leser koden, så tilliten ligger i sperrene foran. CI kjører testene på nytt på en ren maskin, og sjekken etter merge tester det som faktisk ligger på <code>main</code>.</p>
